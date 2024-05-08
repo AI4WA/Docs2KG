@@ -1,6 +1,6 @@
 import fitz
 
-doc = fitz.open("a.pdf") # open a document
+doc = fitz.open("1.pdf") # open a document
 
 for page_index in range(len(doc)): # iterate over pdf pages
     page = doc[page_index] # get the page
