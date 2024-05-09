@@ -1,4 +1,5 @@
-# BlackSwan - Unified Unstructured Data Processing Framework
+# BlackSwan 
+**Unified Unstructured/Structured Data Processing Framework**
 
 The generative AI attracts a lot of attention, one of the goal is using it with our own data.
 Our data mainly in two forms:
