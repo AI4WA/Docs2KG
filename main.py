@@ -21,3 +21,18 @@ for page_index in range(len(doc)): # iterate over pdf pages
 
         pix.save("page_%s-image_%s.png" % (page_index, image_index)) # save the image as png
         pix = None
+
+import fitz
+
+doc = fitz.open("1.pdf") # open a document
+out = open("output.txt", "wb") # create a text output
+for page in doc: # iterate the document pages
+    text = page.get_text().encode("utf8") # get plain text (is in UTF-8)
+    out.write(text) # write text of page
+    out.write(bytes((12,))) # write page delimiter (form feed 0x0C)
+out.close()
+
+
+doc = fitz.open("1.pdf")
+page = doc[0]
+paths = page.get_drawings()
