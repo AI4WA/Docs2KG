@@ -27,4 +27,4 @@ So we need to be able to extract the text and images from the PDF.
 
 The overall workflow will be:
 
-![img.png](docs/images/pdf_process.png)
+![img.png](docs/images/pdf_process.jpg)
