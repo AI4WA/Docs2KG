@@ -28,3 +28,14 @@ So we need to be able to extract the text and images from the PDF.
 The overall workflow will be:
 
 ![img.png](docs/images/pdf_process.jpg)
+
+## Setup
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pip install -r requirements.dev.txt
+
+pip install -e .
+```

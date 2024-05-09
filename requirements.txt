@@ -1,1 +1,2 @@
 pymupdf
+pymupdf4llm
