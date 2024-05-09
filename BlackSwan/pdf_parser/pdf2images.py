@@ -25,7 +25,7 @@ class PDF2Images(PDFParserBase):
 
         for page_index in range(len(doc)):  # iterate over pdf pages
             page = doc[page_index]  # get the page
-            image_list = page.get_images()
+            image_list = page.get_images(full=True)
 
             # print the number of images found on the page
             if image_list:
