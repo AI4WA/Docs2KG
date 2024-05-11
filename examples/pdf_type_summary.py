@@ -1,10 +1,10 @@
-from BlackSwan.pdf_parser.pdf2text import PDF2Text
-from BlackSwan.pdf_parser.pdf2images import PDF2Images
-from BlackSwan.pdf_parser.pdf2tables import PDF2Tables
-from BlackSwan.pdf_parser.pdf_type import check_pdf_type, PDF_TYPE_SCANNED
-from BlackSwan.utils.constants import DATA_INPUT_DIR
+from Docs2KG.parser.pdf.pdf2text import PDF2Text
+from Docs2KG.parser.pdf.pdf2images import PDF2Images
+from Docs2KG.parser.pdf.pdf2tables import PDF2Tables
+from Docs2KG.parser.pdf.pdf_type import check_pdf_type, PDF_TYPE_SCANNED
+from Docs2KG.utils.constants import DATA_INPUT_DIR
 from pathlib import Path
-from BlackSwan.utils.get_logger import get_logger
+from Docs2KG.utils.get_logger import get_logger
 import argparse
 
 logger = get_logger(__name__)
@@ -15,7 +15,12 @@ if __name__ == "__main__":
     """
 
     args = argparse.ArgumentParser()
-    args.add_argument("--input_dir", type=str, help="Input directory of pdf files", default=DATA_INPUT_DIR)
+    args.add_argument(
+        "--input_dir",
+        type=str,
+        help="Input directory of pdf files",
+        default=DATA_INPUT_DIR,
+    )
     args = args.parse_args()
     data_input_dir = Path(args.input_dir)
     total_counter = 0

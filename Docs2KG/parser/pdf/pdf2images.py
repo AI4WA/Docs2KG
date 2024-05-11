@@ -1,5 +1,5 @@
-from BlackSwan.utils.get_logger import get_logger
-from BlackSwan.pdf_parser.base import PDFParserBase
+from Docs2KG.utils.get_logger import get_logger
+from Docs2KG.parser.pdf.base import PDFParserBase
 import fitz
 
 logger = get_logger(__name__)

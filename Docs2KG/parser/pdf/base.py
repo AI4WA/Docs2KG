@@ -1,5 +1,5 @@
 from pathlib import Path
-from BlackSwan.utils.constants import DATA_OUTPUT_DIR
+from Docs2KG.utils.constants import DATA_OUTPUT_DIR
 
 
 class PDFParserBase:

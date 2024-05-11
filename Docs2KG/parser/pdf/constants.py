@@ -1,0 +1,3 @@
+PDF_TYPE_SCANNED = "scanned"
+PDF_TYPE_EXPORTED = "exported"
+PDF_METADATA_SCAN_INDICATOR = "scan"

@@ -1,7 +1,7 @@
 import pymupdf4llm
 import fitz
-from BlackSwan.utils.get_logger import get_logger
-from BlackSwan.pdf_parser.base import PDFParserBase
+from Docs2KG.utils.get_logger import get_logger
+from Docs2KG.parser.pdf.base import PDFParserBase
 
 logger = get_logger(__name__)
 
