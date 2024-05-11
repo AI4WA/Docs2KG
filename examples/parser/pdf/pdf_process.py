@@ -1,7 +1,7 @@
-from Docs2KG.parser.pdf.pdf2text import PDF2Text
 from Docs2KG.parser.pdf.pdf2images import PDF2Images
 from Docs2KG.parser.pdf.pdf2tables import PDF2Tables
-from Docs2KG.parser.pdf.pdf_type import check_pdf_type, PDF_TYPE_SCANNED
+from Docs2KG.parser.pdf.pdf2text import PDF2Text
+from Docs2KG.parser.pdf.pdf_type import PDF_TYPE_SCANNED, check_pdf_type
 from Docs2KG.utils.constants import DATA_INPUT_DIR
 from Docs2KG.utils.get_logger import get_logger
 

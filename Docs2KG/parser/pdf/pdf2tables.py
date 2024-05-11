@@ -1,6 +1,7 @@
-from Docs2KG.utils.get_logger import get_logger
-from Docs2KG.parser.pdf.base import PDFParserBase
 import fitz
+
+from Docs2KG.parser.pdf.base import PDFParserBase
+from Docs2KG.utils.get_logger import get_logger
 
 logger = get_logger(__name__)
 
