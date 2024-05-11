@@ -1,34 +1,48 @@
-# Docs2KG 
+# Docs2KG
+
 **An Open Source Framework for Transforming Unstructured Data into Unified Knowledge Graph**
 
-The generative AI attracts a lot of attention, one of the goals is using it with our own data.
-Our data mainly in two forms:
+Three pillars of the LLM applications in our opinion:
 
-- Unstructured data: text, image
-- Structured data: database, csv, etc.
+- Data
+- RAG
+- LLM
 
-To handle the unstructured data, one of the common approaches we do is to get the chunk of text into embeddings,
-and then do vector search.
-This is the first and naive generation of RAG (Retrieval Augmented Generation).
+Most of the tools in the market nowadays are focusing on the Retrieval Augmented Generation (RAG) pipelines or
+How to get Large Language Models (LLMs) to run locally.
 
-However, we do want to be able to do the information retrieval under the global context (which includes the structured
-data and unstructured data).
+However, to make sure the wider community can benefit from the latest research, we need to first solve the data problem.
 
-So, find a way to unify the structured data and unstructured data, and then does the information retrieval across the
-whole data context be an ultimate goal.
+The Wider community includes personal users, small business, and even large enterprises.
+Some of them might have developed databases, while most of them do have a lot of data, but they are all in unstructured
+form, and distributed in different places.
 
-So the end of goal of this project is to build a unified framework to allow you to talk with your databases and
-documents in a unified way.
+So the first challenges will be:
 
-## Unstructured Data Processing
+- How can we easily process the unstructured data into a centralized place?
+- What is the best way to organize the data within the centralized place?
 
-The Main data under this category is PDF.
+## Proposed Solution
 
-So we need to be able to extract the text and images from the PDF.
+This package is a proposed solution to the above challenges.
+
+- We developed the tool for the wider community to easily process the unstructured data into a centralized place.
+- We proposed a way to organize the data within the centralized place, via a Unified Knowledge Graph altogether with
+  semi-structured data.
+
+### Overall Architecture
 
 The overall workflow will be:
 
 ![img.png](docs/images/pdf_process.jpg)
+
+## Unstructured Data Processing
+
+### PDF
+
+The Main data under this category is PDF.
+
+So we need to be able to extract the text and images from the PDF.
 
 ## Setup
 
