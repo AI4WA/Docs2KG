@@ -1,3 +1,6 @@
 pymupdf
 pymupdf4llm
 pandas
+markdownify
+beautifulsoup4
+requests
