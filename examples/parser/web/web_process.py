@@ -1,5 +1,5 @@
-from Docs2KG.parser.web.web2markdown import Web2Markdown
 from Docs2KG.parser.web.web2images import Web2Images
+from Docs2KG.parser.web.web2markdown import Web2Markdown
 from Docs2KG.parser.web.web2tables import Web2Tables
 
 if __name__ == "__main__":

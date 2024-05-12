@@ -1,10 +1,12 @@
+import csv
+from urllib.parse import quote, unquote
+
+import pandas as pd
+import requests
+from bs4 import BeautifulSoup
+
 from Docs2KG.parser.web.base import WebParserBase
 from Docs2KG.utils.get_logger import get_logger
-from bs4 import BeautifulSoup
-import requests
-from urllib.parse import quote, unquote
-import csv
-import pandas as pd
 
 logger = get_logger(__name__)
 

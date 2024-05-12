@@ -1,10 +1,12 @@
 from pathlib import Path
 from typing import List
-from bs4 import BeautifulSoup
-import requests
-from Docs2KG.utils.get_logger import get_logger
 from urllib.parse import quote
-from Docs2KG.utils.constants import DATA_OUTPUT_DIR, DATA_INPUT_DIR
+
+import requests
+from bs4 import BeautifulSoup
+
+from Docs2KG.utils.constants import DATA_INPUT_DIR, DATA_OUTPUT_DIR
+from Docs2KG.utils.get_logger import get_logger
 
 logger = get_logger(__name__)
 

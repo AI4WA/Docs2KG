@@ -1,8 +1,10 @@
+from urllib.parse import quote, unquote, urljoin
+
+import requests
+from bs4 import BeautifulSoup
+
 from Docs2KG.parser.web.base import WebParserBase
 from Docs2KG.utils.get_logger import get_logger
-from bs4 import BeautifulSoup
-import requests
-from urllib.parse import quote, unquote, urljoin
 
 logger = get_logger(__name__)
 

@@ -1,10 +1,13 @@
-from Docs2KG.parser.web.base import WebParserBase
-from markdownify import MarkdownConverter, markdownify as md
-from bs4 import BeautifulSoup
-import requests
 from urllib.parse import quote
 
+import requests
+from bs4 import BeautifulSoup
+from markdownify import MarkdownConverter
+from markdownify import markdownify as md
+
+from Docs2KG.parser.web.base import WebParserBase
 from Docs2KG.utils.get_logger import get_logger
+
 logger = get_logger(__name__)
 
 class Web2Markdown(WebParserBase):
