@@ -34,7 +34,7 @@ This package is a proposed solution to the above challenges.
 
 The overall workflow will be:
 
-![img.png](docs/images/pdf_process.jpg)
+![img.png](docs/images/Docs2KG.jpg)
 
 ## Unstructured Data Processing
 
