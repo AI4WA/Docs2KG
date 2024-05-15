@@ -1,8 +1,6 @@
-import csv
-from urllib.parse import quote, unquote
+from urllib.parse import unquote
 
 import pandas as pd
-import requests
 from bs4 import BeautifulSoup
 
 from Docs2KG.parser.web.base import WebParserBase
