@@ -1,8 +1,3 @@
-from urllib.parse import quote
-
-import requests
-from bs4 import BeautifulSoup
-from markdownify import MarkdownConverter
 from markdownify import markdownify as md
 
 from Docs2KG.parser.web.base import WebParserBase
