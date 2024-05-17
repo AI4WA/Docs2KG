@@ -38,11 +38,17 @@ The overall workflow will be:
 
 ## Unstructured Data Processing
 
+![img.png](docs/images/DataPreprocessing.jpg)
+
 ### PDF
 
 The Main data under this category is PDF.
 
 So we need to be able to extract the text and images from the PDF.
+
+## Unified Knowledge Graph
+
+![img.png](docs/images/KGConstruction.jpg)
 
 ## Setup
 
