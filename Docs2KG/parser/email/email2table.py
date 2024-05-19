@@ -10,6 +10,7 @@ from Docs2KG.utils.get_logger import get_logger
 
 logger = get_logger(__name__)
 
+
 class Email2Table(EmailParseBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -22,7 +23,9 @@ class Email2Table(EmailParseBase):
         tables = []
         current_table = []
         for line in lines:
-            if re.match(r'^\s*\S+', line):  # This regex can be adjusted based on your table format
+            if re.match(
+                r"^\s*\S+", line
+            ):  # This regex can be adjusted based on your table format
                 current_table.append(line.split())
             else:
                 if current_table:
@@ -34,8 +37,7 @@ class Email2Table(EmailParseBase):
 
     def extract2table(self):
 
-
-        with open(self.email_filepath, 'rb') as f:
+        with open(self.email_filepath, "rb") as f:
             msg = email.message_from_binary_file(f)
 
         table_index = 0
@@ -83,21 +85,29 @@ class Email2Table(EmailParseBase):
 
             # Handle attachments
             # TODO: Haven't tested
-            if part.get('Content-Disposition') and 'attachment' in part.get('Content-Disposition'):
+            if part.get("Content-Disposition") and "attachment" in part.get(
+                "Content-Disposition"
+            ):
                 filename = part.get_filename()
-                if filename and (filename.endswith('.csv') or filename.endswith('.xls') or filename.endswith('.xlsx')):
+                if filename and (
+                    filename.endswith(".csv")
+                    or filename.endswith(".xls")
+                    or filename.endswith(".xlsx")
+                ):
                     attachment_data = part.get_payload(decode=True)
                     attachment_path = os.path.join(self.table_output_dir, filename)
 
-                    with open(attachment_path, 'wb') as f:
+                    with open(attachment_path, "wb") as f:
                         f.write(attachment_data)
 
-                    if filename.endswith('.csv'):
+                    if filename.endswith(".csv"):
                         df = pd.read_csv(attachment_path)
                     else:
                         df = pd.read_excel(attachment_path)
 
-                    csv_filename = os.path.join(self.table_output_dir, f'table_{table_index}.csv')
-                    df.to_csv(csv_filename, index=False, encoding='utf-8')
-                    logger.info(f'Saved attachment table to {csv_filename}')
+                    csv_filename = os.path.join(
+                        self.table_output_dir, f"table_{table_index}.csv"
+                    )
+                    df.to_csv(csv_filename, index=False, encoding="utf-8")
+                    logger.info(f"Saved attachment table to {csv_filename}")
                     table_index += 1

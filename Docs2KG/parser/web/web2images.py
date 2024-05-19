@@ -8,6 +8,7 @@ from Docs2KG.utils.get_logger import get_logger
 
 logger = get_logger(__name__)
 
+
 class Web2Images(WebParserBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -21,17 +22,17 @@ class Web2Images(WebParserBase):
         url = unquote(quoted_url)
         html_img_dir = self.image_output_dir / quoted_url
         html_img_dir.mkdir(parents=True, exist_ok=True)
-        with open(f'{self.input_dir}/{quoted_url}.html', 'r') as f:
+        with open(f"{self.input_dir}/{quoted_url}.html", "r") as f:
             html_content = f.read()
-        soup = BeautifulSoup(html_content, 'html.parser')
-        for imgtag in soup.find_all('img'):
-            img_url = imgtag.get('src')
-            if not img_url.startswith('http'):
+        soup = BeautifulSoup(html_content, "html.parser")
+        for imgtag in soup.find_all("img"):
+            img_url = imgtag.get("src")
+            if not img_url.startswith("http"):
                 img_url = urljoin(url, img_url)
             img_data = requests.get(img_url).content
-            img_name = quote(imgtag['src'], '')
+            img_name = quote(imgtag["src"], "")
 
-            with open(f'{html_img_dir}/{img_name}', 'wb') as f:
+            with open(f"{html_img_dir}/{img_name}", "wb") as f:
                 f.write(img_data)
             logger.info(f"Extracted the HTML file from {url} to images")
 

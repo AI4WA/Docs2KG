@@ -1,2 +1,6 @@
 black
 isort
+mkdocstrings[python]
+mkdocs
+mkdocs-material
+mkdocs_gen_files

@@ -4,6 +4,3 @@ pandas
 markdownify
 beautifulsoup4
 requests
-mkdocs
-mkdocs-material
-mkdocstrings
