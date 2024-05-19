@@ -34,11 +34,11 @@ This package is a proposed solution to the above challenges.
 
 The overall workflow will be:
 
-![img.png](docs/images/Docs2KG.jpg)
+![img.png](images/Docs2KG.jpg)
 
 ## Unstructured Data Processing
 
-![img.png](docs/images/DataPreprocessing.jpg)
+![img.png](images/DataPreprocessing.jpg)
 
 ### PDF
 
@@ -48,7 +48,7 @@ So we need to be able to extract the text and images from the PDF.
 
 ## Unified Knowledge Graph
 
-![img.png](docs/images/KGConstruction.jpg)
+![img.png](images/KGConstruction.jpg)
 
 ## Development Setup
 

@@ -1,8 +1,14 @@
 site_name: Docs2KG
-
+site_url: https://docs2kg.ai4wa.com
 theme:
   name: material
-
+  logo: images/AI4WA.png
+  favicon: images/favicon.ico
+  features:
+    - search.suggest
+  icon:
+    repo: fontawesome/brands/github
+repo_url: https://github.com/AI4WA/Docs2KG
 plugins:
   - search
   - gen-files:
@@ -13,3 +19,10 @@ plugins:
         python:
           rendering:
             show_source: true
+            show_source_link: true
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/AI4WA/Docs2KG
+    - icon: fontawesome/brands/linkedin
+      link: https://www.linkedin.com/company/ai4wa
