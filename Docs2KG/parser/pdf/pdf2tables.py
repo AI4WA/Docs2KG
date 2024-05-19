@@ -10,8 +10,6 @@ class PDF2Tables(PDFParserBase):
     def __init__(self, *args, **kwargs):
         """
         Initialize the class with the pdf file
-        :param args:
-        :param kwargs:
         """
         super().__init__(*args, **kwargs)
         self.table_output_dir = self.output_dir / "tables"
@@ -20,7 +18,6 @@ class PDF2Tables(PDFParserBase):
     def extract2tables(self):
         """
         Extract images from the pdf file
-        :return:
         """
         doc = fitz.open(self.pdf_file)  # open a document
 

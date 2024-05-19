@@ -18,6 +18,9 @@ class Web2Tables(WebParserBase):
     def extract2tables(self, quoted_url):
         """
         Extract the HTML file to tables and save it to the output directory
+
+        Args:
+            quoted_url (str): The quoted URL of the HTML file
         """
         html_tab_dir = self.table_output_dir / quoted_url
         html_tab_dir.mkdir(parents=True, exist_ok=True)

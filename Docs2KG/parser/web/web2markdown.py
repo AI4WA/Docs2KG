@@ -15,6 +15,9 @@ class Web2Markdown(WebParserBase):
     def convert2markdown(self, quoted_url):
         """
         Convert the HTML file to markdown and save it to the output directory
+
+        Args:
+            quoted_url (str): The quoted URL of the HTML file
         """
         with open(f"{self.input_dir}/{quoted_url}.html", "r") as f:
             html_content = f.read()

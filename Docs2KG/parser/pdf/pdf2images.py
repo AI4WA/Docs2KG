@@ -34,7 +34,7 @@ class PDF2Images(PDFParserBase):
 
             for image_index, img in enumerate(
                     image_list, start=1
-            ):  # enumerate the image list
+            ):  # list the image list
                 xref = img[0]  # get the XREF of the image
                 pix = fitz.Pixmap(doc, xref)  # create a Pixmap
 
