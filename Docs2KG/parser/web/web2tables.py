@@ -8,6 +8,7 @@ from Docs2KG.utils.get_logger import get_logger
 
 logger = get_logger(__name__)
 
+
 class Web2Tables(WebParserBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -21,17 +22,19 @@ class Web2Tables(WebParserBase):
         html_tab_dir = self.table_output_dir / quoted_url
         html_tab_dir.mkdir(parents=True, exist_ok=True)
 
-        with open(f'{self.input_dir}/{quoted_url}.html', 'r') as f:
+        with open(f"{self.input_dir}/{quoted_url}.html", "r") as f:
             html_content = f.read()
 
-        soup = BeautifulSoup(html_content, 'html.parser')
-        for i, table in enumerate(soup.find_all('table')):
+        soup = BeautifulSoup(html_content, "html.parser")
+        for i, table in enumerate(soup.find_all("table")):
             rows = []
-            for row in table.find_all('tr'):
-                cells = [cell.get_text(strip=True) for cell in row.find_all(['th', 'td'])]
+            for row in table.find_all("tr"):
+                cells = [
+                    cell.get_text(strip=True) for cell in row.find_all(["th", "td"])
+                ]
                 rows.append(cells)
             df = pd.DataFrame(rows[1:], columns=rows[0])  # Assuming first row is header
-            csv_filename = f'{html_tab_dir}/{i}.csv'
+            csv_filename = f"{html_tab_dir}/{i}.csv"
             df.to_csv(csv_filename, index=False)
             logger.info(f"Extracted the HTML file from {unquote(quoted_url)} to tables")
 

@@ -11,7 +11,10 @@ class PDF2Text(PDFParserBase):
     def extract2text(self) -> str:
         """
         Extract text from the pdf file
-        :return: The extracted text
+
+        Returns:
+            str: The extracted text
+
         """
         doc = fitz.open(self.pdf_file)
         text = ""
@@ -26,7 +29,9 @@ class PDF2Text(PDFParserBase):
     def extract2markdown(self) -> str:
         """
         Convert the extracted text to markdown
-        :return: The markdown text
+
+        Returns:
+            str: The markdown text
         """
         doc = fitz.open(self.pdf_file)
         md_text = pymupdf4llm.to_markdown(doc)

@@ -5,8 +5,11 @@ from Docs2KG.utils.get_logger import get_logger
 
 logger = get_logger(__name__)
 
+
 class EmailParseBase:
-    def __init__(self, email_filename: str, input_dir: Path = None, output_dir: Path = None):
+    def __init__(
+        self, email_filename: str, input_dir: Path = None, output_dir: Path = None
+    ):
         """
         Initialize the EmailParseBase class
         :param email_filename: Name of the email file
@@ -23,4 +26,4 @@ class EmailParseBase:
             email_input_folder.mkdir(parents=True, exist_ok=True)
             self.output_dir = email_output_folder
             self.input_dir = email_input_folder
-        self.email_filepath = f'{self.input_dir}/{email_filename}'
+        self.email_filepath = f"{self.input_dir}/{email_filename}"

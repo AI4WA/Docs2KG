@@ -2,7 +2,17 @@ import logging
 import sys
 
 
-def get_logger(name):
+def get_logger(name) -> logging.Logger:
+    """
+    Get a logger object with the given name
+
+    Args:
+        name (str): Name of the logger
+
+    Returns:
+        logging.Logger: Logger object
+
+    """
     # Create a logger
     the_logger = logging.getLogger(name)
     the_logger.setLevel(logging.INFO)
