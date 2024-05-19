@@ -9,7 +9,7 @@ permissions:
   pages: write
 
 jobs:
-  deploy:
+  update-docs-gh-pages:
     runs-on: ubuntu-latest
 
     steps:
