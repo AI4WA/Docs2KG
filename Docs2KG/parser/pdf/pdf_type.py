@@ -17,8 +17,13 @@ def get_pdf_type(pdf_path: Path) -> str:
     """
     Check if the PDF is scanned or exported
     If with_metadata is True, return the metadata also
-    :param pdf_path: Path
-    :return:
+
+    Args:
+        pdf_path (Path): Path to the pdf file
+
+    Returns:
+        str: The type of the pdf file
+
     """
     doc = fitz.open(pdf_path)
     metadata = doc.metadata
@@ -32,9 +37,14 @@ def get_metadata_for_files(pdf_files: list[Path]) -> pd.DataFrame:
     """
     Get metadata for a list of pdf files
     We will return the metadata as a DataFrame, and for further processing
-    :param pdf_files: list[Path], list of pdf files
-    :return: pd.DataFrame
+
+    Args:
+        pdf_files (list[Path]): list of pdf files
+
+    Returns:
+        pd.DataFrame: DataFrame containing metadata for the pdf files
     """
+
     all_metadata = []
     for pdf_file in pdf_files:
         doc = fitz.open(pdf_file)
