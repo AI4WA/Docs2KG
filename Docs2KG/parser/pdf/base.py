@@ -7,7 +7,11 @@ class PDFParserBase:
     def __init__(self, pdf_file: Path, output_dir: Path = None) -> None:
         """
         Initialize the class with the pdf file
-        :param pdf_file: The path to the pdf file
+
+        Args:
+            pdf_file (Path): The path to the pdf file
+            output_dir (Path): The path to the output directory, default is None, will be default to DATA_OUTPUT_DIR
+
         """
         self.pdf_file = pdf_file
         self.output_dir = output_dir

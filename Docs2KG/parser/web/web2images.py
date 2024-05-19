@@ -18,6 +18,9 @@ class Web2Images(WebParserBase):
     def extract2images(self, quoted_url):
         """
         Extract the HTML file to images and save it to the output directory
+
+        Args:
+            quoted_url (str): The quoted URL of the HTML file
         """
         url = unquote(quoted_url)
         html_img_dir = self.image_output_dir / quoted_url
