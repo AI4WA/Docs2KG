@@ -1,4 +1,4 @@
-site_name: Docs2KG
+site_name: Docs2KG by AI4WA
 site_url: https://docs2kg.ai4wa.com
 theme:
   name: material
@@ -6,6 +6,7 @@ theme:
   favicon: images/favicon.ico
   features:
     - search.suggest
+    - navigation.tabs
   icon:
     repo: fontawesome/brands/github
 repo_url: https://github.com/AI4WA/Docs2KG
