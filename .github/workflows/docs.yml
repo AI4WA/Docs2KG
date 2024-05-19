@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - main  # Set this to the branch from which you deploy
+permissions:
+  contents: write
+  pages: write
 
 jobs:
   deploy:
