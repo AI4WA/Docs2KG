@@ -13,7 +13,7 @@ logger = get_logger(__name__)
 
 class WebParserBase:
     def __init__(
-            self, urls: List[str], output_dir: Path = None, input_dir: Path = None
+        self, urls: List[str], output_dir: Path = None, input_dir: Path = None
     ) -> None:
         """
         Initialize the WebParserBase class
