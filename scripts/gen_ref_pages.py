@@ -18,8 +18,8 @@ for path in sorted(src.rglob("*.py")):
         # get this to be the index html under this folder
         # replace the __init__ with index
         identifier = ".".join(parts[:-1])
-        parts = parts[:-1] + ("index",)
-        full_doc_path = "Sources" / module_path.parent / "index.md"
+        parts = parts[:-1] + ("main",)
+        full_doc_path = "Sources" / module_path.parent / "main.md"
         if identifier == "":
             print(
                 f"::: Docs2KG",
