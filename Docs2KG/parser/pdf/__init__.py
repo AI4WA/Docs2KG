@@ -18,4 +18,4 @@ import Docs2KG.parser.pdf.base
 import Docs2KG.parser.pdf.pdf2images
 import Docs2KG.parser.pdf.pdf2tables
 import Docs2KG.parser.pdf.pdf2text
-import Docs2KG.parser.pdf.pdf_type
+import Docs2KG.parser.pdf.pdf2metadata
