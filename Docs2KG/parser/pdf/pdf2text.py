@@ -1,5 +1,3 @@
-from typing import Dict
-
 import fitz
 import pandas as pd
 import pymupdf4llm
@@ -12,8 +10,7 @@ logger = get_logger(__name__)
 
 class PDF2Text(PDFParserBase):
 
-    def extract2text(self,
-                     output_csv: bool = False) -> dict:
+    def extract2text(self, output_csv: bool = False) -> dict:
         """
         Extract text from the pdf file
 
@@ -30,26 +27,15 @@ class PDF2Text(PDFParserBase):
         texts = []
         for page in doc:
             text += page.get_text()
-            texts.append({
-                "page_number": page.number,
-                "text": page.get_text()
-            })
-        # output to the output directory
-        output_file = self.output_dir / f"{self.pdf_file.stem}.txt"
-        with open(output_file, "w") as f:
-            f.write(text)
+            texts.append({"page_number": page.number, "text": page.get_text()})
+
         df = pd.DataFrame(texts)
         if output_csv:
             df.to_csv(self.output_dir / "text.csv", index=False)
-        return {
-            "text": text,
-            "output_file": output_file,
-            "df": df
-        }
+            return {"text": text, "output_file": self.output_dir / "text.csv", "df": df}
+        return {"text": text, "output_file": None, "df": df}
 
-    def extract2markdown(self,
-                         output_csv: bool = False
-                         ) -> dict:
+    def extract2markdown(self, output_csv: bool = False) -> dict:
         """
         Convert the extracted text to markdown
 
@@ -65,27 +51,16 @@ class PDF2Text(PDFParserBase):
         md_text = pymupdf4llm.to_markdown(doc)
         logger.debug(f"Markdown text: {md_text}")
 
-        # output to the output directory
-        output_file = self.output_dir / f"{self.pdf_file.stem}.md"
-        with open(output_file, "w") as f:
-            f.write(md_text)
-
         # split the Markdown text into pages
         markdown_texts = []
         for page in doc:
             page_text = pymupdf4llm.to_markdown(doc=doc, pages=[page.number])
             logger.debug(f"Page {page.number} Markdown text: {page_text}")
-            markdown_texts.append({
-                "page_number": page.number,
-                "text": page_text
-            })
+            markdown_texts.append({"page_number": page.number, "text": page_text})
         df = pd.DataFrame(markdown_texts)
 
         if output_csv:
-            df.to_csv(self.output_dir / f"md.csv", index=False)
+            df.to_csv(self.output_dir / "md.csv", index=False)
+            return {"md": md_text, "output_file": self.output_dir / "md.csv", "df": df}
 
-        return {
-            "md": md_text,
-            "output_file": output_file,
-            "df": df
-        }
+        return {"md": md_text, "df": df, "output_file": None}
