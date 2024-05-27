@@ -20,11 +20,12 @@ class PDF2Text(PDFParserBase):
 
         Returns:
             dict: The dictionary containing the extracted text, output file and dataframe
-            | Key           | Value                           |
-            |---------------|---------------------------------|
-            | text          | Full text of document           |
-            | output_file   | Where the full text save to     |
-            | df            | [pd.Dataframe] Each page txt    |
+
+        | Key           | Value                           |
+        |---------------|---------------------------------|
+        | text          | Full text of document           |
+        | output_file   | Where the full text save to     |
+        | df            | [pd.Dataframe] Each page txt    |
 
 
         """
