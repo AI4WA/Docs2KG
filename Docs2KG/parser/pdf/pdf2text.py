@@ -60,7 +60,7 @@ class PDF2Text(PDFParserBase):
             #     with open(image_output_file, "wb") as f:
             #         f.write(image_bytes)
             # output to json
-            with open(self.output_dir / f"{self.pdf_file.stem}_page_{page.number}.json", "w") as f:
+            # with open(self.output_dir / f"{self.pdf_file.stem}_page_{page.number}.json", "w") as f:
             # f.write(str(text_dict))
             # for key, value in text_dict.items():
             #     logger.info(f"key: {key}")
