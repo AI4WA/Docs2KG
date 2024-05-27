@@ -11,12 +11,11 @@ class timer:
         """
         init the timer
 
-        Parameters
-        ----------
-        the_logger: Logger
-            logger to write the logs
-        message: str
-            message to log, like start xxx
+        Args:
+            the_logger (Logger): logger object
+            message (str): message to be logged
+
+
         """
         self.message = message
         self.logger = the_logger
