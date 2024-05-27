@@ -12,7 +12,8 @@ logger = get_logger(__name__)
 
 
 class LLMMarkdown2Json:
-    def __init__(self, markdown_file: Path):
+    def __init__(self, markdown_file: Path,
+                 llm_model_name: str = "gpt-3.5-turbo"):
         """
         Convert markdown to json using OpenAI LLM
 
@@ -30,16 +31,26 @@ class LLMMarkdown2Json:
         if self.markdown_file.suffix != ".csv":
             raise ValueError("Only support csv")
         self.json_csv_file = markdown_file.with_suffix(".json.csv")
+        self.llm_model_name = llm_model_name
         self.client = OpenAI()
 
     def extract2json(self):
+        if self.json_csv_file.exists():
+            logger.info(f"{self.json_csv_file} already exists")
+            return
         df = pd.read_csv(self.markdown_file)
         # show progress bar
         df["layout_json"] = df["text"].progress_apply(
-            self.openai_layout_json, desc="Layout JSON"
+            self.openai_layout_json
+        )
+        tqdm.pandas(
+            desc="Layout JSON"
         )
         df["content_json"] = df["text"].progress_apply(
             self.openai_content_json, desc="Content JSON"
+        )
+        tqdm.pandas(
+            desc="Content JSON"
         )
         df.to_csv(self.json_csv_file, index=False)
 
@@ -180,7 +191,7 @@ class LLMMarkdown2Json:
 
         """
         response = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=self.llm_model_name,
             response_format={"type": "json_object"},
             messages=[
                 {
@@ -309,7 +320,7 @@ class LLMMarkdown2Json:
 
         """
         response = self.client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model=self.llm_model_name,
             response_format={"type": "json_object"},
             messages=[
                 {

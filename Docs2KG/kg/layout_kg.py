@@ -1,4 +1,5 @@
 from pathlib import Path
+import pandas as pd
 
 
 class LayoutKG:
@@ -7,8 +8,8 @@ class LayoutKG:
     """
 
     def __init__(
-        self,
-        folder_path: Path,
+            self,
+            folder_path: Path,
     ):
         """
         Initialize the class with the pdf file
@@ -21,6 +22,19 @@ class LayoutKG:
         self.kg_folder = self.folder_path / "kg"
         if not self.kg_folder.exists():
             self.kg_folder.mkdir(parents=True, exist_ok=True)
+        self.df = pd.DataFrame(
+            columns=[
+                "source_node_type",
+                "source_node_uuid",
+                "source_node_properties",
+                "edge_type",
+                "edge_uuid",
+                "edge_properties",
+                "destination_node_type",
+                "destination_node_uuid",
+                "destination_node_properties",
+            ]
+        )
 
     def create_kg(self):
         """
