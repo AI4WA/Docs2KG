@@ -1,3 +1,4 @@
+import shutil
 from pathlib import Path
 
 from Docs2KG.utils.constants import DATA_OUTPUT_DIR
@@ -20,3 +21,8 @@ class PDFParserBase:
             pdf_file_folder = DATA_OUTPUT_DIR / pdf_file.name
             pdf_file_folder.mkdir(parents=True, exist_ok=True)
             self.output_dir = pdf_file_folder
+
+        # copy original pdf to the output folder
+        pdf_file_output = self.output_dir / pdf_file.name
+        if not pdf_file_output.exists():
+            shutil.copy(pdf_file, pdf_file_output)
