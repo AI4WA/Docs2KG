@@ -1,5 +1,11 @@
 from pathlib import Path
 
+import markdown_to_json
+
+from Docs2KG.utils.get_logger import get_logger
+
+logger = get_logger(__name__)
+
 
 class Markdown2JSON:
     """
@@ -54,3 +60,8 @@ class Markdown2JSON:
         """
         with open(self.markdown_file, "r") as f:
             markdown_content = f.read()
+        json_content = markdown_to_json.jsonify(markdown_content)
+        logger.info(json_content)
+        with open(self.json_file, "w") as f:
+            f.write(json_content)
+        return json_content

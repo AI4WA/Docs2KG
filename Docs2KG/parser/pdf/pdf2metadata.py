@@ -22,6 +22,19 @@ def get_scanned_or_exported(pdf_path: Path) -> str:
 
     This can be extended based on the use case scenario
 
+    | Key           | Value                                   |
+    |---------------|-----------------------------------------|
+    | producer      | producer (producing software)           |
+    | format        | format: ‘PDF-1.4’, ‘EPUB’, etc.         |
+    | encryption    | encryption method used if any           |
+    | author        | author                                  |
+    | modDate       | date of last modification               |
+    | keywords      | keywords                                |
+    | title         | title                                   |
+    | creationDate  | date of creation                        |
+    | creator       | creating application                    |
+    | subject       | subject                                 |
+
     Args:
         pdf_path (Path): Path to the pdf file
 

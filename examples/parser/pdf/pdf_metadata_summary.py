@@ -21,12 +21,16 @@ if __name__ == "__main__":
     )
     args = args.parse_args()
     data_input_dir = Path(args.input_dir)
-    total_counter = 0
-    scanned_counter = 0
+
     all_files = list(data_input_dir.rglob("*.pdf"))
     all_metadata_df = get_metadata_for_files(all_files, log_summary=True)
-    # then you can save it to a file
-    all_metadata_df.to_csv(DATA_OUTPUT_DIR / "metadata.csv", index=False)
-    # or use can use the metadata as the orchestrator
-    # so files can be directed to different processing pipelines
-    # and modules based on the metadata
+    """
+    Then you can save it to a file
+    
+    Example: 
+        all_metadata_df.to_csv(DATA_OUTPUT_DIR / "metadata.csv", index=False)
+
+    Or use can use the metadata as the orchestrator
+    So files can be directed to different processing pipelines
+    And modules based on the metadata
+    """

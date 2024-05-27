@@ -1,7 +1,7 @@
-from Docs2KG.parser.pdf.pdf2images import PDF2Images
+from Docs2KG.parser.pdf.pdf2blocks import PDF2Blocks
+from Docs2KG.parser.pdf.pdf2metadata import PDF_TYPE_SCANNED, get_scanned_or_exported
 from Docs2KG.parser.pdf.pdf2tables import PDF2Tables
 from Docs2KG.parser.pdf.pdf2text import PDF2Text
-from Docs2KG.parser.pdf.pdf2metadata import PDF_TYPE_SCANNED, get_scanned_or_exported
 from Docs2KG.utils.constants import DATA_INPUT_DIR
 from Docs2KG.utils.get_logger import get_logger
 
@@ -13,13 +13,23 @@ if __name__ == "__main__":
     if scanned_or_exported == PDF_TYPE_SCANNED:
         logger.info("This is a scanned pdf, can not process it now")
     else:
-        # process text
-        pdf2text = PDF2Text(pdf_file)
-        text = pdf2text.extract2text_dict()
-        # md_text = pdf2text.extract2markdown()
-        # process images
-        # pdf2images = PDF2Images(pdf_file)
-        # pdf2images.extract2images()
-        # process tables
-        # pdf2tables = PDF2Tables(pdf_file)
-        # pdf2tables.extract2tables()
+        """
+        This will extract the text, images.
+
+        Output images/text with bounding boxes into a df
+
+        """
+        pdf_2_blocks = PDF2Blocks(pdf_file)
+        blocks_dict = pdf_2_blocks.extract_df(output_csv=True)
+        logger.info(blocks_dict)
+
+        """
+        This will extract the tables from the pdf file
+                
+        """
+        pdf2tables = PDF2Tables(pdf_file)
+        pdf2tables.extract2tables(output_csv=True)
+
+        pdf_to_text = PDF2Text(pdf_file)
+        text = pdf_to_text.extract2text()
+        md_text = pdf_to_text.extract2markdown()
