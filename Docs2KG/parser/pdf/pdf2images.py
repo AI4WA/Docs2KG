@@ -33,7 +33,7 @@ class PDF2Images(PDFParserBase):
                 logger.info(f"No images found on page {page_index}")
 
             for image_index, img in enumerate(
-                    image_list, start=1
+                image_list, start=1
             ):  # list the image list
                 xref = img[0]  # get the XREF of the image
                 pix = fitz.Pixmap(doc, xref)  # create a Pixmap

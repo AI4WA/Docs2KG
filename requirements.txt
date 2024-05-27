@@ -4,3 +4,4 @@ pandas
 markdownify
 beautifulsoup4
 requests
+tabulate
