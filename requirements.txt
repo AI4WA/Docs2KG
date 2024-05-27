@@ -6,3 +6,5 @@ beautifulsoup4
 requests
 tabulate
 openai
+tqdm
+tiktoken
