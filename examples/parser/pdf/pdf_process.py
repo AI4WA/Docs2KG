@@ -15,11 +15,11 @@ if __name__ == "__main__":
     else:
         # process text
         pdf2text = PDF2Text(pdf_file)
-        text = pdf2text.extract2text()
-        md_text = pdf2text.extract2markdown()
+        text = pdf2text.extract2text_dict()
+        # md_text = pdf2text.extract2markdown()
         # process images
-        pdf2images = PDF2Images(pdf_file)
-        pdf2images.extract2images()
+        # pdf2images = PDF2Images(pdf_file)
+        # pdf2images.extract2images()
         # process tables
-        pdf2tables = PDF2Tables(pdf_file)
-        pdf2tables.extract2tables()
+        # pdf2tables = PDF2Tables(pdf_file)
+        # pdf2tables.extract2tables()
