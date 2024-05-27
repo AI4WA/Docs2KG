@@ -33,7 +33,7 @@ class PDF2Tables(PDFParserBase):
             page = doc[page_index]  # get the page
             tabs = page.find_tables()
             if tabs.tables:
-                logger.info(f"Found {len(tabs.tables)} tables on page {page_index}")
+                logger.debug(f"Found {len(tabs.tables)} tables on page {page_index}")
                 for table_index, tab in enumerate(tabs.tables, start=1):
                     # save to csv
 

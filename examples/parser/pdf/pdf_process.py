@@ -30,6 +30,11 @@ if __name__ == "__main__":
         pdf2tables = PDF2Tables(pdf_file)
         pdf2tables.extract2tables(output_csv=True)
 
+        """
+        Processing the text from the pdf file
+        
+        """
+
         pdf_to_text = PDF2Text(pdf_file)
-        text = pdf_to_text.extract2text()
-        md_text = pdf_to_text.extract2markdown()
+        text = pdf_to_text.extract2text(output_csv=True)
+        md_text = pdf_to_text.extract2markdown(output_csv=True)

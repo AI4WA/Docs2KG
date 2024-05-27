@@ -1,7 +1,9 @@
+from typing import Dict
+
 import fitz
 import pandas as pd
 import pymupdf4llm
-from typing import Dict
+
 from Docs2KG.parser.pdf.base import PDFParserBase
 from Docs2KG.utils.get_logger import get_logger
 
@@ -19,15 +21,9 @@ class PDF2Text(PDFParserBase):
         output_csv (bool, optional): Whether to output the extracted data to a csv file. Defaults to False.
 
         Returns:
-            dict: The dictionary containing the extracted text, output file and dataframe
-
-        | Key           | Value                           |
-        |---------------|---------------------------------|
-        | text          | Full text of document           |
-        | output_file   | Where the full text save to     |
-        | df            | [pd.Dataframe] Each page txt    |
-
-
+            text (str): The extracted text
+            output_file (Path): The path to the output file
+            df (pd.Dataframe): The dataframe containing the text information
         """
         doc = fitz.open(self.pdf_file)
         text = ""
@@ -44,27 +40,52 @@ class PDF2Text(PDFParserBase):
             f.write(text)
         df = pd.DataFrame(texts)
         if output_csv:
-            df.to_csv(self.output_dir / f"{self.pdf_file.stem}.csv", index=False)
+            df.to_csv(self.output_dir / "text.csv", index=False)
         return {
             "text": text,
             "output_file": output_file,
             "df": df
         }
 
-    def extract2markdown(self) -> str:
+    def extract2markdown(self,
+                         output_csv: bool = False
+                         ) -> dict:
         """
         Convert the extracted text to markdown
 
+        Args:
+            output_csv (bool, optional): Whether to output the extracted data to a csv file. Defaults to False.
+
         Returns:
-            str: The Markdown text
+            md (str): The Markdown text,
+            output_file (Path): Where the Markdown text save to
+            df (pd.Dataframe): Each page for the Markdown text
         """
         doc = fitz.open(self.pdf_file)
         md_text = pymupdf4llm.to_markdown(doc)
-        logger.info(f"Markdown text: {md_text}")
+        logger.debug(f"Markdown text: {md_text}")
 
         # output to the output directory
         output_file = self.output_dir / f"{self.pdf_file.stem}.md"
         with open(output_file, "w") as f:
             f.write(md_text)
 
-        return md_text
+        # split the Markdown text into pages
+        markdown_texts = []
+        for page in doc:
+            page_text = pymupdf4llm.to_markdown(doc=doc, pages=[page.number])
+            logger.debug(f"Page {page.number} Markdown text: {page_text}")
+            markdown_texts.append({
+                "page_number": page.number,
+                "text": page_text
+            })
+        df = pd.DataFrame(markdown_texts)
+
+        if output_csv:
+            df.to_csv(self.output_dir / f"md.csv", index=False)
+
+        return {
+            "md": md_text,
+            "output_file": output_file,
+            "df": df
+        }
