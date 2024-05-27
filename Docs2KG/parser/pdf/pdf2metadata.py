@@ -8,6 +8,8 @@ from Docs2KG.parser.pdf.constants import (
     PDF_TYPE_EXPORTED,
     PDF_TYPE_SCANNED,
 )
+from Docs2KG.utils.count_tokens import count_tokens
+from Docs2KG.utils.estimate_price import estimate_price
 from Docs2KG.utils.get_logger import get_logger
 
 logger = get_logger(__name__)
@@ -34,7 +36,7 @@ def get_scanned_or_exported(pdf_path: Path) -> str:
     | creationDate  | date of creation                        |
     | creator       | creating application                    |
     | subject       | subject                                 |
-
+    | text_token    | number of tokens in the text            |
     Args:
         pdf_path (Path): Path to the pdf file
 
@@ -72,6 +74,18 @@ def get_metadata_for_files(
     for pdf_file in pdf_files:
         doc = fitz.open(pdf_file)
         metadata = doc.metadata
+        texts = []
+        for page in doc:
+            texts.append(page.get_text())
+        metadata["text_token"] = count_tokens(" ".join(texts))
+        # estimate the price
+        metadata["estimated_price_3.5"] = estimate_price(metadata["text_token"])
+        metadata["estimated_price_4o"] = estimate_price(
+            metadata["text_token"], model_name="gpt-4o"
+        )
+        metadata["estimated_price_4_turbo"] = estimate_price(
+            metadata["text_token"], model_name="gpt-4-turbo"
+        )
         all_metadata.append(metadata)
     metadata_df = pd.DataFrame(all_metadata)
     # add a line called "file_path" to the metadata
@@ -102,6 +116,14 @@ def get_metadata_for_files(
         # log the scanned_or_exported column into  value|count format
         logger.info(
             f"Scanned or Exported Column:\n {metadata_df['scanned_or_exported'].value_counts().to_markdown()}"
+        )
+        # estimate token in total
+        logger.info(f"Total Token Count: {metadata_df['text_token'].sum()}")
+        # estimate the price in total
+        logger.info(f"Estimated Price 3.5: {metadata_df['estimated_price_3.5'].sum()}")
+        logger.info(f"Estimated Price 4o: {metadata_df['estimated_price_4o'].sum()}")
+        logger.info(
+            f"Estimated Price 4 Turbo: {metadata_df['estimated_price_4_turbo'].sum()}"
         )
 
     return metadata_df

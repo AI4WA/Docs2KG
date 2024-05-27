@@ -1,10 +1,7 @@
 import argparse
 from pathlib import Path
 
-from Docs2KG.parser.pdf.pdf2blocks import PDF2Blocks
 from Docs2KG.parser.pdf.pdf2metadata import get_metadata_for_files
-from Docs2KG.parser.pdf.pdf2tables import PDF2Tables
-from Docs2KG.parser.pdf.pdf2text import PDF2Text
 from Docs2KG.utils.constants import DATA_INPUT_DIR, DATA_OUTPUT_DIR
 from Docs2KG.utils.get_logger import get_logger
 
@@ -37,3 +34,4 @@ if __name__ == "__main__":
     So files can be directed to different processing pipelines
     And modules based on the metadata
     """
+    all_metadata_df.to_csv(DATA_OUTPUT_DIR / "metadata.csv", index=False)

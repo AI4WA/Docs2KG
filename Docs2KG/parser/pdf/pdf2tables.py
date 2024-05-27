@@ -53,5 +53,5 @@ class PDF2Tables(PDFParserBase):
                     )
         df = pd.DataFrame(tables_list)
         if output_csv:
-            df.to_csv(self.output_dir / f"tables.csv", index=False)
+            df.to_csv(self.table_output_dir / f"tables.csv", index=False)
         return df

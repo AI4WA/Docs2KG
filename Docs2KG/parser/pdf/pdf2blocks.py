@@ -18,6 +18,8 @@ class PDF2Blocks(PDFParserBase):
         super().__init__(*args, **kwargs)
         self.images_output_dir = self.output_dir / "images"
         self.images_output_dir.mkdir(parents=True, exist_ok=True)
+        self.text_output_dir = self.output_dir / "texts"
+        self.text_output_dir.mkdir(parents=True, exist_ok=True)
 
     def extract_df(self, output_csv: bool = False) -> Dict[str, pd.DataFrame]:
         """
@@ -68,8 +70,8 @@ class PDF2Blocks(PDFParserBase):
         texts_df = pd.DataFrame(texts)
         images_df = pd.DataFrame(images)
         if output_csv:
-            texts_df.to_csv(self.output_dir / f"blocks_texts.csv", index=False)
-            images_df.to_csv(self.output_dir / f"blocks_images.csv", index=False)
+            texts_df.to_csv(self.text_output_dir / f"blocks_texts.csv", index=False)
+            images_df.to_csv(self.images_output_dir / f"blocks_images.csv", index=False)
         return {
             "texts": texts_df,
             "images": images_df,
