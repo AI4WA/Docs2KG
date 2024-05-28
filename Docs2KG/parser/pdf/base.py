@@ -1,7 +1,12 @@
+import json
 import shutil
 from pathlib import Path
 
+from Docs2KG.parser.pdf.pdf2metadata import get_meda_for_file
 from Docs2KG.utils.constants import DATA_OUTPUT_DIR
+from Docs2KG.utils.get_logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class PDFParserBase:
@@ -26,3 +31,12 @@ class PDFParserBase:
         pdf_file_output = self.output_dir / pdf_file.name
         if not pdf_file_output.exists():
             shutil.copy(pdf_file, pdf_file_output)
+        self.metadata_json = self.output_dir / "metadata.json"
+        if self.metadata_json.exists():
+            self.metadata = json.load(open(self.metadata_json))
+        else:
+            metadata = get_meda_for_file(pdf_file)
+            logger.info(metadata)
+            self.metadata = metadata
+            with open(self.metadata_json, "w") as f:
+                f.write(json.dumps(metadata))

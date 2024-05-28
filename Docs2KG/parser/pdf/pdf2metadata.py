@@ -52,6 +52,37 @@ def get_scanned_or_exported(pdf_path: Path) -> str:
     return PDF_TYPE_EXPORTED
 
 
+def get_meda_for_file(pdf_file: Path) -> dict:
+    """
+    Get metadata for a single pdf file
+
+    Args:
+        pdf_file (Path): Path to the pdf file
+
+    Returns:
+        metadata (dict): Metadata for the pdf file
+    """
+    doc = fitz.open(pdf_file)
+    metadata = doc.metadata
+    texts = []
+    for page in doc:
+        texts.append(page.get_text())
+    metadata["text_token"] = count_tokens(" ".join(texts))
+    # estimate the price
+    metadata["estimated_price_3.5"] = estimate_price(metadata["text_token"])
+    metadata["estimated_price_4o"] = estimate_price(
+        metadata["text_token"], model_name="gpt-4o"
+    )
+    metadata["estimated_price_4_turbo"] = estimate_price(
+        metadata["text_token"], model_name="gpt-4-turbo"
+    )
+    metadata["file_path"] = pdf_file.as_posix()
+    metadata["scanned_or_exported"] = get_scanned_or_exported(pdf_file)
+    # to dict
+    metadata = dict(metadata)
+    return metadata
+
+
 def get_metadata_for_files(
     pdf_files: list[Path], log_summary: bool = False
 ) -> pd.DataFrame:
@@ -72,20 +103,7 @@ def get_metadata_for_files(
 
     all_metadata = []
     for pdf_file in pdf_files:
-        doc = fitz.open(pdf_file)
-        metadata = doc.metadata
-        texts = []
-        for page in doc:
-            texts.append(page.get_text())
-        metadata["text_token"] = count_tokens(" ".join(texts))
-        # estimate the price
-        metadata["estimated_price_3.5"] = estimate_price(metadata["text_token"])
-        metadata["estimated_price_4o"] = estimate_price(
-            metadata["text_token"], model_name="gpt-4o"
-        )
-        metadata["estimated_price_4_turbo"] = estimate_price(
-            metadata["text_token"], model_name="gpt-4-turbo"
-        )
+        metadata = get_meda_for_file(pdf_file)
         all_metadata.append(metadata)
     metadata_df = pd.DataFrame(all_metadata)
     # add a line called "file_path" to the metadata
