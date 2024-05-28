@@ -23,6 +23,10 @@ if __name__ == "__main__":
     data_input_dir = Path(args.input_dir)
 
     all_files = list(data_input_dir.rglob("*.pdf"))
+    if len(all_files) == 0:
+        logger.info("No pdf files found in the input directory")
+        raise Exception("No pdf files found in the input directory")
+
     all_metadata_df = get_metadata_for_files(all_files, log_summary=True)
     """
     Then you can save it to a file

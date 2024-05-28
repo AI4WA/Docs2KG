@@ -29,7 +29,6 @@ def track_usage(response: ChatCompletion) -> float:
     Returns:
         total_cost (float): The total cost of the response
     """
-    usage = response.usage
     llm_model = response.model
     prompt_tokens = response.usage.prompt_tokens
     completion_tokens = response.usage.completion_tokens
