@@ -1,4 +1,5 @@
 from pathlib import Path
+
 import pandas as pd
 
 
@@ -8,8 +9,8 @@ class LayoutKG:
     """
 
     def __init__(
-            self,
-            folder_path: Path,
+        self,
+        folder_path: Path,
     ):
         """
         Initialize the class with the pdf file
