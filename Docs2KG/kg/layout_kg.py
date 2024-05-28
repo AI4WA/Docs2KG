@@ -1,11 +1,16 @@
 from pathlib import Path
-
+import json
 import pandas as pd
+
+from Docs2KG.utils.get_logger import get_logger
+
+logger = get_logger(__name__)
 
 
 class LayoutKG:
     """
     Layout Knowledge Graph
+    This is for one pdf file
     """
 
     def __init__(
@@ -36,6 +41,7 @@ class LayoutKG:
                 "destination_node_properties",
             ]
         )
+        self.metadata = json.load((self.folder_path / "metadata.json").open())
 
     def create_kg(self):
         """
@@ -49,9 +55,18 @@ class LayoutKG:
 
     def document_kg(self):
         """
-        Construct the text knowledge graph
+        Construct the layout knowledge graph skeleton first
+
+        We will require the md.json.csv file with the following columns:
+
+        - layout_json
         """
-        pass
+        text_folder = self.folder_path / "texts"
+        md_json_csv = text_folder / "md.json.csv"
+        texts_json_df = pd.read_csv(md_json_csv)
+        columns = texts_json_df.columns.tolist()
+        logger.info(f"Columns: {columns}")
+        # we will focus on the layout json
 
     def link_image_to_page(self):
         """
