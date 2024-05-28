@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 from openai import OpenAI
 from tqdm import tqdm
-
+from typing import List
 from Docs2KG.utils.get_logger import get_logger
 from Docs2KG.utils.llm.track_usage import track_usage
 
@@ -187,13 +187,10 @@ class LLMMarkdown2Json:
         Returns:
 
         """
-        response = self.client.chat.completions.create(
-            model=self.llm_model_name,
-            response_format={"type": "json_object"},
-            messages=[
-                {
-                    "role": "system",
-                    "content": """You are a helpful assistant to convert markdown to JSON format.
+        messages = [
+            {
+                "role": "system",
+                "content": """You are a helpful assistant to convert markdown to JSON format.
                     
         The markdown given to you will have some noise/not meaningful characters or information, you need to think about cleaning
         the markdown into a cleaned version.
@@ -300,19 +297,23 @@ class LLMMarkdown2Json:
         
         Keep the meaningful hierarchy information within markdown via the html h1/h2/... tags 
         Get them proper in json format.
+        
+        If it is a table, leave it as 
+        {
+            "tag": "table",
+            "content": {original markdown content for the table},
+            "children": []
+        }
+        
+        Do not need to further decode.
         """,
-                },
-                {
-                    "role": "user",
-                    "content": f"Convert the following markdown to JSON format:\n\n{markdown}",
-                },
-            ],
-        )
-        logger.debug(response)
-        content = response.choices[0].message.content
-        logger.debug(content)
-        self.cost += track_usage(response)
-        return content
+            },
+            {
+                "role": "user",
+                "content": f"Convert the following markdown to JSON format:\n\n{markdown}",
+            },
+        ]
+        return self.openai_call(messages)
 
     def openai_content_json(self, markdown: str):
         """
@@ -326,25 +327,59 @@ class LLMMarkdown2Json:
         Returns:
 
         """
-        response = self.client.chat.completions.create(
-            model=self.llm_model_name,
-            response_format={"type": "json_object"},
-            messages=[
-                {
-                    "role": "system",
-                    "content": """
+        messages = [
+            {
+                "role": "system",
+                "content": """
                     You are a helpful assistant to convert markdown to JSON format.
                     You will be focusing on extracting meaningful key-value pairs from the markdown text.
                     """,
-                },
-                {
-                    "role": "user",
-                    "content": f"Convert the following markdown to JSON format:\n\n{markdown}",
-                },
-            ],
-        )
-        logger.debug(response)
-        content = response.choices[0].message.content
-        logger.debug(content)
-        self.cost += track_usage(response)
-        return content
+            },
+            {
+                "role": "user",
+                "content": f"Convert the following markdown to JSON format:\n\n{markdown}",
+            },
+        ]
+        return self.openai_call(messages)
+
+    def openai_call(self, messages: List[dict]) -> str:
+        """
+        Call the OpenAI API to get the response
+        Args:
+            messages (List[dict]): The messages to send to the OpenAI API
+
+
+        Returns:
+            response_json_str (str): The response from the OpenAI API
+        """
+        result_json_str = ""
+        while True:
+            response = self.client.chat.completions.create(
+                model=self.llm_model_name,
+                response_format={"type": "json_object"},
+                messages=messages,
+            )
+            logger.debug(response)
+            content = response.choices[0].message.content
+            logger.debug(content)
+            result_json_str += content
+            self.cost += track_usage(response)
+            # if finish_reason is length, then it is not complete
+            logger.debug(response.choices[0].finish_reason)
+            if response.choices[0].finish_reason != "length":
+                break
+            else:
+                messages.append(
+                    {
+                        "role": "assistant",
+                        "content": content,
+                    }
+                )
+                messages.append(
+                    {
+                        "role": "user",
+                        "content": "Continue the response",
+                    }
+                )
+
+        return result_json_str
