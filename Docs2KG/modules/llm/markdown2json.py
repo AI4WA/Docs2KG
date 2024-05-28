@@ -5,6 +5,7 @@ from openai import OpenAI
 from tqdm import tqdm
 
 from Docs2KG.utils.get_logger import get_logger
+from Docs2KG.utils.llm.track_usage import track_usage
 
 tqdm.pandas()
 
@@ -12,8 +13,7 @@ logger = get_logger(__name__)
 
 
 class LLMMarkdown2Json:
-    def __init__(self, markdown_file: Path,
-                 llm_model_name: str = "gpt-3.5-turbo"):
+    def __init__(self, markdown_file: Path, llm_model_name: str = "gpt-3.5-turbo-0125"):
         """
         Convert markdown to json using OpenAI LLM
 
@@ -26,6 +26,7 @@ class LLMMarkdown2Json:
 
         Args:
             markdown_file (Path): The path to the markdown file
+            llm_model_name (str): The OpenAI LLM model name
         """
         self.markdown_file = markdown_file
         if self.markdown_file.suffix != ".csv":
@@ -33,26 +34,22 @@ class LLMMarkdown2Json:
         self.json_csv_file = markdown_file.with_suffix(".json.csv")
         self.llm_model_name = llm_model_name
         self.client = OpenAI()
+        self.cost = 0
 
     def extract2json(self):
         if self.json_csv_file.exists():
             logger.info(f"{self.json_csv_file} already exists")
             return
+        current_cost = self.cost
         df = pd.read_csv(self.markdown_file)
-        # show progress bar
-        df["layout_json"] = df["text"].progress_apply(
-            self.openai_layout_json
-        )
-        tqdm.pandas(
-            desc="Layout JSON"
-        )
-        df["content_json"] = df["text"].progress_apply(
-            self.openai_content_json, desc="Content JSON"
-        )
-        tqdm.pandas(
-            desc="Content JSON"
-        )
+
+        for index, row in tqdm(df.iterrows(), total=df.shape[0], desc="Layout JSON"):
+            df.at[index, "layout_json"] = self.openai_layout_json(row["text"])
+        for index, row in tqdm(df.iterrows(), total=df.shape[0], desc="Content JSON"):
+            df.at[index, "content_json"] = self.openai_content_json(row["text"])
+
         df.to_csv(self.json_csv_file, index=False)
+        logger.info(f"Cost: {self.cost - current_cost}")
 
     def openai_layout_json(self, markdown):
         """
@@ -305,6 +302,7 @@ class LLMMarkdown2Json:
         logger.debug(response)
         content = response.choices[0].message.content
         logger.debug(content)
+        self.cost += track_usage(response)
         return content
 
     def openai_content_json(self, markdown: str):
@@ -339,4 +337,5 @@ class LLMMarkdown2Json:
         logger.debug(response)
         content = response.choices[0].message.content
         logger.debug(content)
+        self.cost += track_usage(response)
         return content
