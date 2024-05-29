@@ -367,14 +367,14 @@ class LayoutKG:
         """
         Export the knowledge graph to json file
         """
-        with open(self.kg_folder / "document_kg.json", "w") as f:
+        with open(self.kg_folder / "layout_kg.json", "w") as f:
             json.dump(self.kg_json, f, indent=2)
 
     def load_kg(self):
         """
         Load the knowledge graph from JSON
         """
-        with open(self.kg_folder / "document_kg.json", "r") as f:
+        with open(self.kg_folder / "layout_kg.json", "r") as f:
             self.kg_json = json.load(f)
 
     def get_page_node(self, page_number: int) -> Optional[dict]:
