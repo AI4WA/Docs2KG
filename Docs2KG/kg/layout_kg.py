@@ -6,6 +6,7 @@ from uuid import uuid4
 import pandas as pd
 
 from Docs2KG.utils.get_logger import get_logger
+from Docs2KG.utils.rect import BlockFinder
 
 logger = get_logger(__name__)
 
@@ -171,6 +172,7 @@ class LayoutKG:
                 "node_properties": {
                     "image_path": row["image_path"],
                     "image_block_number": row["block_number"],
+                    "bbox": row["bbox"],
                 },
                 "children": [],
             }
@@ -182,7 +184,11 @@ class LayoutKG:
     def link_table_to_page(self):
         """
         Link the table file to proper page.
-        And if possible, link to the proper position in the page
+
+        Link to proper position in the page will be in function
+
+        `link_table_to_context`
+
         """
         table_df = pd.read_csv(self.folder_path / "tables" / "tables.csv")
         for index, row in table_df.iterrows():
@@ -206,7 +212,66 @@ class LayoutKG:
         """
         Construct the image knowledge graph
         """
-        pass
+        images_df = pd.read_csv(self.folder_path / "images" / "blocks_images.csv")
+        text_block_df = pd.read_csv(self.folder_path / "texts" / "blocks_texts.csv")
+        logger.debug(text_block_df.columns.tolist())
+        for index, row in images_df.iterrows():
+            page_number = row["page_number"]
+
+            logger.info(f"Processing image {index} in page {page_number}")
+            page_node = self.get_page_node(page_number)
+            # get the text blocks that are in the same page
+            text_blocks = text_block_df[
+                text_block_df["page_number"] == page_number
+            ].copy(deep=True)
+            # clean the text_block without text after text clean all space
+            text_blocks = text_blocks[
+                text_blocks["text"].str.strip() != ""
+            ].reset_index()
+            image_bbox = row["bbox"]
+            logger.debug(f"Image bbox: {image_bbox}")
+            text_blocks_bbox = text_blocks["bbox"].tolist()
+            nearby_text_blocks = BlockFinder.find_closest_blocks(
+                image_bbox, text_blocks_bbox
+            )
+            nearby_info = []
+            for key, value in nearby_text_blocks.items():
+                if value is not None:
+                    text_block = text_blocks.loc[value]
+                    logger.debug(text_block)
+                    nearby_info.append(
+                        {
+                            "node_type": "text_block",
+                            "uuid": str(uuid4()),
+                            "node_properties": {
+                                "text_block_bbox": text_block["bbox"],
+                                "content": text_block["text"],
+                                "position": key,
+                                "text_block_number": int(text_block["block_number"]),
+                            },
+                            "children": [],
+                        }
+                    )
+            """
+            find the image node
+            add the nearby_info to the children
+            the image node will have the image_block_number to identify it
+            """
+            for child in page_node["children"]:
+                if (
+                    child["node_type"] == "image"
+                    and child["node_properties"]["image_block_number"]
+                    == row["block_number"]
+                ):
+                    child["children"] = nearby_info
+                    break
+            """
+            We also need to loop the nodes within this page
+            if the text block is highly similar to a content node, then we can link them together
+            """
+            # TODO: link the text to a left within the page tree, so we can link the image to the context
+
+        self.export_kg()
 
     def link_table_to_context(self):
         """
