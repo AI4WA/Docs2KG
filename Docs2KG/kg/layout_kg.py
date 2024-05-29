@@ -293,9 +293,75 @@ class LayoutKG:
 
     def link_table_to_context(self):
         """
-        Construct the table knowledge graph
+        Link the table to the context
+
+        We have two ways to make it work
+
+        1. Loop the table, and for tree leaf within the page node, if it is tagged as table, then link them together
+        2. We have bbox of the table, so we can find the nearby text block, and link them together
+
         """
-        pass
+        table_df = pd.read_csv(self.folder_path / "tables" / "tables.csv")
+        text_block_df = pd.read_csv(self.folder_path / "texts" / "blocks_texts.csv")
+        for index, row in table_df.iterrows():
+            page_number = row["page_index"]
+            page_node = self.get_page_node(page_number)
+            table_bbox = row["bbox"]
+            text_blocks = text_block_df[
+                text_block_df["page_number"] == page_number
+            ].copy(deep=True)
+            text_blocks = text_blocks[
+                text_blocks["text"].str.strip() != ""
+            ].reset_index()
+            text_blocks_bbox = text_blocks["bbox"].tolist()
+            nearby_text_blocks = BlockFinder.find_closest_blocks(
+                table_bbox, text_blocks_bbox
+            )
+            nearby_info = []
+            nearby_info_dict = {}
+            for key, value in nearby_text_blocks.items():
+                if value is not None:
+                    text_block = text_blocks.loc[value]
+                    nearby_info.append(
+                        {
+                            "node_type": "text_block",
+                            "uuid": str(uuid4()),
+                            "node_properties": {
+                                "text_block_bbox": text_block["bbox"],
+                                "content": text_block["text"],
+                                "position": key,
+                                "text_block_number": int(text_block["block_number"]),
+                            },
+                            "children": [],
+                        }
+                    )
+                    nearby_info_dict[key] = {"content": text_block["text"], "uuids": []}
+            nearby_info_dict = self.link_image_to_tree_node(page_node, nearby_info_dict)
+            for item in nearby_info:
+                key = item["node_properties"]["position"]
+                item["linkage"] = nearby_info_dict[key]["uuids"]
+
+            # the second matching method, loop the tree node of the page
+            table_nodes = self.get_specific_tag_nodes(page_node, "table")
+            page_tree_table_node = None
+            # matched table nodes
+            table_index = row["table_index"]
+            if len(table_nodes) >= table_index:
+                page_tree_table_node = table_nodes[table_index - 1]
+
+            # give table node a linkage to the table_node
+
+            for child in page_node["children"]:
+                if (
+                    child["node_type"] == "table_csv"
+                    and child["node_properties"]["table_index"] == row["table_index"]
+                ):
+                    child["children"] = nearby_info
+                    # add the linkage from table_csv to table_tree_node
+                    child["linkage"] = [page_tree_table_node["uuid"]]
+                    break
+
+        self.export_kg()
 
     def export_kg(self) -> None:
         """
@@ -326,6 +392,26 @@ class LayoutKG:
                 return page
         logger.error(f"Page {page_number} not found")
         return None
+
+    def get_specific_tag_nodes(self, tree_json: dict, tag: str) -> list:
+        """
+        Get the specific tag nodes from the page node
+
+        Args:
+            tree_json (dict): The tree_json
+            tag (str): The tag to find
+
+        Returns:
+            list: The list of nodes with the specific tag
+        """
+        nodes = []
+        if "children" not in tree_json:
+            return nodes
+        for child in tree_json["children"]:
+            if child["node_type"] == tag:
+                nodes.append(child)
+            nodes.extend(self.get_specific_tag_nodes(child, tag))
+        return nodes
 
     @classmethod
     def recursive_layout_json(cls, layout_json: dict) -> dict:

@@ -37,8 +37,15 @@ class BlockFinder:
             distances.append(distance)
 
         df = pd.DataFrame(distances)
+
         # for all the text blocks on top, get the closest one
-        above_blocks = df[df["position_vertical"] == "above"]
+        # get above one and also the abs(min_vertical_distance) is > 1
+        above_blocks = df[df["position_vertical"] == "above"].copy(deep=True)
+        # get is all value to be abs
+        above_blocks["min_vertical_distance"] = above_blocks[
+            "min_vertical_distance"
+        ].apply(abs)
+        above_blocks = above_blocks[abs(above_blocks["min_vertical_distance"]) > 1]
 
         if not above_blocks.empty:
             # if it is above it, then the closest one is the one with the highest vertical distance as the value is <0
@@ -49,17 +56,27 @@ class BlockFinder:
             above_index = closest_above_block["index"].values[0]
 
         # for all the text blocks on bottom, get the closest one
-        below_blocks = df[df["position_vertical"] == "below"]
+        below_blocks = df[df["position_vertical"] == "below"].copy(deep=True)
+        # get is all value to be abs
+        below_blocks["min_vertical_distance"] = below_blocks[
+            "min_vertical_distance"
+        ].apply(abs)
+        below_blocks = below_blocks[abs(below_blocks["min_vertical_distance"]) > 1]
         if not below_blocks.empty:
             # if it is below it, then the closest one is the one with the lowest vertical distance as the value is >0
             closest_below_block = below_blocks[
                 below_blocks["min_vertical_distance"]
-                == below_blocks["min_vertical_distance"].max()
+                == below_blocks["min_vertical_distance"].min()
             ]
             below_index = closest_below_block["index"].values[0]
 
         # for all the text blocks on left, get the closest one
-        left_blocks = df[df["position_horizontal"] == "left"]
+        left_blocks = df[df["position_horizontal"] == "left"].copy(deep=True)
+        # get is all value to be abs
+        left_blocks["min_horizontal_distance"] = left_blocks[
+            "min_horizontal_distance"
+        ].apply(abs)
+        left_blocks = left_blocks[abs(left_blocks["min_horizontal_distance"]) > 1]
         if not left_blocks.empty:
             closest_left_block = left_blocks[
                 left_blocks["min_horizontal_distance"]
@@ -68,11 +85,16 @@ class BlockFinder:
             left_index = closest_left_block["index"].values[0]
 
         # for all the text blocks on right, get the closest one
-        right_blocks = df[df["position_horizontal"] == "right"]
+        right_blocks = df[df["position_horizontal"] == "right"].copy(deep=True)
+        # get is all value to be abs
+        right_blocks["min_horizontal_distance"] = right_blocks[
+            "min_horizontal_distance"
+        ].apply(abs)
+        right_blocks = right_blocks[abs(right_blocks["min_horizontal_distance"]) > 1]
         if not right_blocks.empty:
             closest_right_block = right_blocks[
                 right_blocks["min_horizontal_distance"]
-                == right_blocks["min_horizontal_distance"].max()
+                == right_blocks["min_horizontal_distance"].min()
             ]
             right_index = closest_right_block["index"].values[0]
 
