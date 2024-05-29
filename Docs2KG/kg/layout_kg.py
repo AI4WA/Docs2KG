@@ -4,6 +4,7 @@ from typing import Optional
 from uuid import uuid4
 
 import pandas as pd
+from sentence_transformers import SentenceTransformer
 
 from Docs2KG.utils.get_logger import get_logger
 from Docs2KG.utils.rect import BlockFinder
@@ -72,6 +73,7 @@ class LayoutKG:
             ]
         )
         self.metadata = json.load((self.folder_path / "metadata.json").open())
+        self.sentence_transformer = SentenceTransformer("all-MiniLM-L6-v2")
 
     def create_kg(self):
         """
@@ -235,6 +237,7 @@ class LayoutKG:
                 image_bbox, text_blocks_bbox
             )
             nearby_info = []
+            nearby_info_dict = {}
             for key, value in nearby_text_blocks.items():
                 if value is not None:
                     text_block = text_blocks.loc[value]
@@ -252,6 +255,26 @@ class LayoutKG:
                             "children": [],
                         }
                     )
+                    nearby_info_dict[key] = {"content": text_block["text"], "uuids": []}
+            """
+            We also need to loop the nodes within this page
+            if the text block is highly similar to a content node, then we can link them together
+
+            How we solve this problem?
+
+            Recursively loop the children of the page node, if the text block is highly similar to the content
+            then we can link them together
+
+            So the function input should be the page_node dict, and the nearby_info_dict
+            Output should be the updated nearby_info_dict with the linked uuid
+            """
+            nearby_info_dict = self.link_image_to_tree_node(page_node, nearby_info_dict)
+            logger.info(nearby_info_dict)
+
+            for item in nearby_info:
+                key = item["node_properties"]["position"]
+                item["linkage"] = nearby_info_dict[key]["uuids"]
+
             """
             find the image node
             add the nearby_info to the children
@@ -265,11 +288,6 @@ class LayoutKG:
                 ):
                     child["children"] = nearby_info
                     break
-            """
-            We also need to loop the nodes within this page
-            if the text block is highly similar to a content node, then we can link them together
-            """
-            # TODO: link the text to a left within the page tree, so we can link the image to the context
 
         self.export_kg()
 
@@ -306,7 +324,7 @@ class LayoutKG:
         for page in self.kg_json["children"]:
             if str(page["node_properties"]["page_number"]) == str(page_number):
                 return page
-        logger.info(f"Page {page_number} not found")
+        logger.error(f"Page {page_number} not found")
         return None
 
     @classmethod
@@ -413,3 +431,65 @@ class LayoutKG:
             "node_properties": {"content": json.dumps(node), "error": error_message},
             "children": [],
         }
+
+    def link_image_to_tree_node(self, page_node: dict, nearby_info_dict: dict) -> dict:
+        """
+        Link the image to the tree node
+
+        - Loop the children of the page node
+        - If the text block is highly similar to the content, add the uuid to the nearby_info_dict
+
+        Match method:
+            − exact match
+            - fuzzy match
+
+        Args:
+            page_node (dict): The page node
+            nearby_info_dict (dict): The nearby info dict
+
+        Returns:
+            nearby_info_dict (dict): The updated nearby info dict
+        """
+
+        if "children" not in page_node:
+            return nearby_info_dict
+        for child in page_node["children"]:
+            # get the text
+            content = child["node_properties"].get("content", "")
+            nearby_info_dict = self.link_image_to_tree_node(child, nearby_info_dict)
+            if content.strip() == "":
+                continue
+            for key, value in nearby_info_dict.items():
+                if content.strip() == value["content"].strip():
+                    value["uuids"].append(child["uuid"])
+                elif self.text_bert_match(content, value["content"]):
+                    value["uuids"].append(child["uuid"])
+
+        return nearby_info_dict
+
+    def text_bert_match(
+        self, text1: str, text2: str, threshold_value: float = 0.8
+    ) -> bool:
+        """
+        Fuzzy match the text
+
+        Args:
+            text1 (str): The first text
+            text2 (str): The second text
+            threshold_value (float): The threshold value
+
+        Returns:
+            bool: Whether the text is similar
+        """
+        embedding1 = self.sentence_transformer.encode([text1])
+        embedding2 = self.sentence_transformer.encode([text2])
+        similarity = self.sentence_transformer.similarity(embedding1, embedding2)
+
+        # get the first value from the similarity matrix, and to float
+        similarity = similarity[0].item()
+        matched = similarity > threshold_value
+
+        if matched:
+            logger.debug(f"Matched: {text1} | {text2}")
+            logger.debug(f"Similarity: {similarity}")
+        return matched

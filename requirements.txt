@@ -8,3 +8,6 @@ tabulate
 openai
 tqdm
 tiktoken
+transformers
+torch
+sentence-transformers
