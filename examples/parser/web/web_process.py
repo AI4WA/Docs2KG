@@ -3,7 +3,7 @@ from Docs2KG.parser.web.web2markdown import Web2Markdown
 from Docs2KG.parser.web.web2tables import Web2Tables
 
 if __name__ == "__main__":
-    url = "https://www.w3schools.com/html/html_tables.asp"
+    url = "https://abs.gov.au/census/find-census-data/quickstats/2021/LGA57080"
     web2md = Web2Markdown(urls=[url])
     web2imgs = Web2Images(urls=[url])
     web2tables = Web2Tables(urls=[url])
