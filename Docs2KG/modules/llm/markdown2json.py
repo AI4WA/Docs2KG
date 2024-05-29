@@ -1,9 +1,10 @@
 from pathlib import Path
+from typing import List
 
 import pandas as pd
 from openai import OpenAI
 from tqdm import tqdm
-from typing import List
+
 from Docs2KG.utils.get_logger import get_logger
 from Docs2KG.utils.llm.track_usage import track_usage
 
@@ -301,11 +302,20 @@ class LLMMarkdown2Json:
         If it is a table, leave it as 
         {
             "tag": "table",
-            "content": {original markdown content for the table},
+            "content": "",
+            "children": []
+        }
+        Content should the full content of the table, do not decompose further into tr/td/th, etc
+        
+        One example can be
+        {
+            "tag": "table",
+            "content": ",header,header,
+                        value,value....
+                        ",
             "children": []
         }
         
-        Do not need to further decode.
         """,
             },
             {

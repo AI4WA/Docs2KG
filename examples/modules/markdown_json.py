@@ -4,5 +4,8 @@ from Docs2KG.utils.constants import DATA_OUTPUT_DIR
 if __name__ == "__main__":
     input_md_file = DATA_OUTPUT_DIR / "4.pdf" / "texts" / "md.csv"
 
-    markdown2json = LLMMarkdown2Json(input_md_file)
+    markdown2json = LLMMarkdown2Json(
+        input_md_file,
+        llm_model_name="gpt-4o",
+    )
     markdown2json.extract2json()

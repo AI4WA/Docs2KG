@@ -7,6 +7,7 @@ logger = get_logger(__name__)
 OPENAI_MODEL_PRICE = {
     "gpt-3.5-turbo-0125": {"input_cost": 0.5, "output_cost": 1.5},
     "gpt-4o": {"input_cost": 5, "output_cost": 15},
+    "gpt-4o-2024-05-13": {"input_cost": 5, "output_cost": 15},
     "gpt-4-turbo": {"input_cost": 10, "output_cost": 30},
     "gpt-4": {"input_cost": 30, "output_cost": 60},
 }

@@ -26,6 +26,12 @@ HTML_TAGS = [
     "span",
     "table",
     "tr",
+    "document",
+    "root",
+    "strong",
+    "footer",
+    "ul",
+    "li",
 ]
 
 
@@ -99,11 +105,11 @@ class LayoutKG:
         md_json_csv = text_folder / "md.json.csv"
         texts_json_df = pd.read_csv(md_json_csv)
         columns = texts_json_df.columns.tolist()
-        logger.info(f"Columns: {columns}")
+        logger.debug(f"Columns: {columns}")
         # we will focus on the layout json
 
         for index, row in texts_json_df.iterrows():
-            logger.info(f"Processing row {index}")
+            logger.info(f"Processing page_index {index}")
             logger.debug(row["layout_json"])
             try:
                 layout_json = json.loads(row["layout_json"])
@@ -121,9 +127,20 @@ class LayoutKG:
                 pages_json.append(page_json)
             except Exception as e:
                 logger.error(f"Error in row {index}: {e}")
-
                 logger.exception(e)
-                break
+                # if this is an unhandled error
+                # we should still keep all data for this page, so we will construct a page with everything we have
+                page_json = {
+                    "node_type": "page",
+                    "uuid": str(uuid4()),
+                    "node_properties": {
+                        "page_number": row["page_number"],
+                        "page_text": row["text"],
+                    },
+                    "children": [],
+                }
+                pages_json.append(page_json)
+
         self.kg_json["children"] = pages_json
         self.export_kg()
 
@@ -164,9 +181,12 @@ class LayoutKG:
 
     def link_table_to_page(self):
         """
-        Construct the table knowledge graph
+        Link the table file to proper page.
+        And if possible, link to the proper position in the page
         """
-        pass
+        table_df = pd.read_csv(self.folder_path / "tables" / "tables.csv")
+        for index, row in table_df.iterrows():
+            logger.info(f"Processing table {index}")
 
     def link_image_to_context(self):
         """
@@ -194,66 +214,6 @@ class LayoutKG:
         with open(self.kg_folder / "document_kg.json", "r") as f:
             self.kg_json = json.load(f)
 
-    @classmethod
-    def recursive_layout_json(cls, layout_json: dict) -> dict:
-        """
-        Recursively decompose the layout json and add to proper level children
-
-        Args:
-            layout_json (dict): The layout json
-
-        Returns:
-            tree_json (dict): The tree json
-        """
-
-        try:
-            tag = layout_json.get("tag", None)
-            if tag == "table":
-                return {
-                    "node_type": layout_json["tag"],
-                    "uuid": str(uuid4()),
-                    "node_properties": {
-                        "records": layout_json["children"],
-                    },
-                    "children": [],
-                }
-            if tag is None:
-                for key in layout_json.keys():
-                    if key in HTML_TAGS:
-                        tag = key
-                        return {
-                            "node_type": tag,
-                            "uuid": str(uuid4()),
-                            "node_properties": {
-                                "content": layout_json[tag],
-                                "text": json.dumps(layout_json),
-                            },
-                            "children": [],
-                        }
-
-            tree_json = {
-                "node_type": layout_json["tag"],
-                "uuid": str(uuid4()),
-                "node_properties": {
-                    "content": layout_json["content"],
-                },
-                "children": [
-                    cls.recursive_layout_json(child)
-                    for child in layout_json.get("children", [])
-                ],
-            }
-            return tree_json
-        except Exception as e:
-            logger.exception(e)
-        return {
-            "node_type": "error",
-            "uuid": str(uuid4()),
-            "node_properties": {
-                "content": str(layout_json),
-            },
-            "children": [],
-        }
-
     def get_page_node(self, page_number: int) -> Optional[dict]:
         """
         Get the page node
@@ -269,3 +229,108 @@ class LayoutKG:
                 return page
         logger.info(f"Page {page_number} not found")
         return None
+
+    @classmethod
+    def recursive_layout_json(cls, layout_json: dict) -> dict:
+        """
+        Recursively processes layout JSON to construct a tree structure, annotating each node with
+        a unique identifier and handling specific HTML structures like tables.
+
+        Args:
+            layout_json (dict): The layout JSON object to process.
+
+        Returns:
+            dict: A tree-like JSON object with added metadata.
+        """
+        try:
+            return cls._process_node(layout_json)
+        except Exception as e:
+            logger.exception("Failed to process layout JSON")
+            return cls._error_node(layout_json, str(e))
+
+    @classmethod
+    def _process_node(cls, node: dict) -> dict:
+        """
+        Process a single node in the layout JSON.
+
+        Args:
+            node (dict): The node to process.
+
+        Returns:
+            dict: The processed node.
+        """
+        tag = node.get("tag")
+        if tag in HTML_TAGS:
+            return cls._create_tree_node(tag, node)
+
+        # If 'tag' is missing, attempt to find a valid HTML tag in the keys
+        for key in node:
+            if key.strip() in HTML_TAGS:
+                return cls._create_tree_node(key, node)
+
+        # If no valid tag is found, handle as an untagged node
+        return cls._untagged_node(node)
+
+    @classmethod
+    def _create_tree_node(cls, tag: str, node: dict) -> dict:
+        """
+        Create a tree node for the JSON structure.
+
+        Args:
+            tag (str): The HTML tag of the node.
+            node (dict): The original node data.
+
+        Returns:
+            dict: A structured tree node.
+        """
+        node_uuid = str(uuid4())
+        node_properties = {
+            "content": node.get("content", ""),
+            "text": json.dumps(node) if tag == "table" else "",
+            "records": node.get("children", []) if tag == "table" else [],
+        }
+        children = [cls._process_node(child) for child in node.get("children", [])]
+
+        return {
+            "node_type": tag,
+            "uuid": node_uuid,
+            "node_properties": node_properties,
+            "children": children,
+        }
+
+    @classmethod
+    def _untagged_node(cls, node: dict) -> dict:
+        """
+        Handles nodes without a recognized HTML tag.
+
+        Args:
+            node (dict): The node to handle.
+
+        Returns:
+            dict: A default structured node indicating an untagged element.
+        """
+        return {
+            "node_type": "untagged",
+            "uuid": str(uuid4()),
+            "node_properties": {"content": json.dumps(node)},
+            "children": [],
+        }
+
+    @classmethod
+    def _error_node(cls, node: dict, error_message: str) -> dict:
+        """
+        Create an error node when processing fails.
+
+        Args:
+            node (dict): The node that caused the error.
+            error_message (str): A message describing the error.
+
+        Returns:
+            dict: An error node.
+        """
+        return {
+            "node_type": "unknown",
+            "uuid": str(uuid4()),
+            "node_properties": {"content": json.dumps(node), "error": error_message},
+            "children": [],
+        }
