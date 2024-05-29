@@ -11,3 +11,4 @@ tiktoken
 transformers
 torch
 sentence-transformers
+openpyxl
