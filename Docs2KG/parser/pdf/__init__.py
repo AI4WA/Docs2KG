@@ -13,9 +13,3 @@ Input of the PDF will mainly from two sources:
 The function check_pdf_type will check the type of the PDF file.
 
 """
-
-import Docs2KG.parser.pdf.base
-import Docs2KG.parser.pdf.pdf2blocks
-import Docs2KG.parser.pdf.pdf2metadata
-import Docs2KG.parser.pdf.pdf2tables
-import Docs2KG.parser.pdf.pdf2text
