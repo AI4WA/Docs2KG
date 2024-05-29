@@ -30,8 +30,8 @@ if __name__ == "__main__":
     all_metadata_df = get_metadata_for_files(all_files, log_summary=True)
     """
     Then you can save it to a file
-    
-    Example: 
+
+    Example:
         all_metadata_df.to_csv(DATA_OUTPUT_DIR / "metadata.csv", index=False)
 
     Or use can use the metadata as the orchestrator

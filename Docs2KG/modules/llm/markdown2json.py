@@ -192,10 +192,10 @@ class LLMMarkdown2Json:
             {
                 "role": "system",
                 "content": """You are a helpful assistant to convert markdown to JSON format.
-                    
+
         The markdown given to you will have some noise/not meaningful characters or information, you need to think about cleaning
         the markdown into a cleaned version.
-        
+
         Then convert the markdown to json
 
         For Example:
@@ -293,20 +293,20 @@ class LLMMarkdown2Json:
         ]
         }
         ```
-        
+
         tag will be from the html convention like h1, h2, h3, p, li, etc.
-        
-        Keep the meaningful hierarchy information within markdown via the html h1/h2/... tags 
+
+        Keep the meaningful hierarchy information within markdown via the html h1/h2/... tags
         Get them proper in json format.
-        
-        If it is a table, leave it as 
+
+        If it is a table, leave it as
         {
             "tag": "table",
             "content": "",
             "children": []
         }
         Content should the full content of the table, do not decompose further into tr/td/th, etc
-        
+
         One example can be
         {
             "tag": "table",
@@ -315,7 +315,7 @@ class LLMMarkdown2Json:
                         ",
             "children": []
         }
-        
+
         """,
             },
             {

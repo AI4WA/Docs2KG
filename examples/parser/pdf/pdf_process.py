@@ -25,14 +25,12 @@ if __name__ == "__main__":
 
         """
         This will extract the tables from the pdf file
-                
         """
         pdf2tables = PDF2Tables(pdf_file)
         pdf2tables.extract2tables(output_csv=True)
 
         """
         Processing the text from the pdf file
-        
         """
 
         pdf_to_text = PDF2Text(pdf_file)
