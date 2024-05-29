@@ -1,7 +1,6 @@
 import json
-import re
+
 from pathlib import Path
-from pprint import pprint
 
 import pandas as pd
 

@@ -22,7 +22,7 @@ for path in sorted(src.rglob("*.py")):
         full_doc_path = "Sources" / module_path.parent / "main.md"
         if identifier == "":
             print(
-                f"::: Docs2KG",
+                "::: Docs2KG",
                 file=mkdocs_gen_files.open(full_doc_path, "w"),
             )
         else:

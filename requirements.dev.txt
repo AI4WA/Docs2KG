@@ -5,3 +5,4 @@ mkdocs
 mkdocs-material
 mkdocs_gen_files
 black[d]
+flake8
