@@ -4,7 +4,6 @@ import re
 
 import pandas as pd
 
-
 from Docs2KG.parser.email.base import EmailParseBase
 from Docs2KG.utils.get_logger import get_logger
 

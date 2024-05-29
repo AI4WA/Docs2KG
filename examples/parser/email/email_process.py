@@ -1,5 +1,6 @@
 from Docs2KG.parser.email.email2images import Email2Images
 from Docs2KG.parser.email.email2markdown import Email2Markdown
+
 # from Docs2KG.parser.email.email2table import Email2Table
 
 if __name__ == "__main__":
