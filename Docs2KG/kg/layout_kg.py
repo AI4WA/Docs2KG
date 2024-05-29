@@ -187,6 +187,20 @@ class LayoutKG:
         table_df = pd.read_csv(self.folder_path / "tables" / "tables.csv")
         for index, row in table_df.iterrows():
             logger.info(f"Processing table {index}")
+            page_node = self.get_page_node(row["page_index"])
+            page_node["children"].append(
+                {
+                    "node_type": "table_csv",
+                    "uuid": str(uuid4()),
+                    "node_properties": {
+                        "table_path": row["file_path"],
+                        "table_index": row["table_index"],
+                        "bbox": row["bbox"],
+                    },
+                }
+            )
+
+        self.export_kg()
 
     def link_image_to_context(self):
         """
