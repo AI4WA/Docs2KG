@@ -152,6 +152,7 @@ class SemanticKG:
                                         "source_uuid": item["uuid"],  # uuid of image
                                         "source_semantic": None,
                                         "predicate": "mentioned_in",
+                                        "predicate_desc": None,
                                         "target_uuid": uuid,
                                         "target_semantic": None,
                                         "extraction_method": "rule_based",
@@ -195,6 +196,7 @@ class SemanticKG:
                                         "source_uuid": item["uuid"],  # uuid of table
                                         "source_semantic": None,
                                         "predicate": "mentioned_in",
+                                        "predicate_desc": None,
                                         "target_uuid": uuid,
                                         "target_semantic": None,
                                         "extraction_method": "rule_based",
