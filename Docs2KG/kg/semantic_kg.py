@@ -208,12 +208,51 @@ class SemanticKG:
 
     def semantic_text2kg(self):
         """
-        Link the text to the knowledge graph
+        ## General Goal of this:
+
+        - A list of triplet: (subject, predicate, object)
+        - Triplets will be associated to the tree
+        - Frequent subject will be merged, and linked
+
+        Plan of attack:
+
+        1. We need to do the Named Entity Recognition for each sentence
+        2. Do NER coexist relationship
+        3. Last step will be extracting the semantic NER vs NER relationship
+
+        How to construction the relation?
+
+        - We will grab the entities mapping to text uuid
+        {
+           "ner_type": {
+            "entities": [uuid1, uuid2]
+           }
+        }
+
+        """
+        if self.llm_enabled:
+            # do the triple extraction
+            self.semantic_triplet_extraction(self.layout_kg)
+            pass
+
+    def semantic_triplet_extraction(self, node: dict) -> dict:
+        """
+        Extract tripplets from the text
+        Args:
+            node:
 
         Returns:
 
         """
-        pass
+        for child in node["children"]:
+            if "children" in child:
+                self.semantic_triplet_extraction(child)
+            content = child["node_properties"].get("content", "")
+            if not content:
+                continue
+            triplets = self.llm_extract_triplet(content)
+            logger.info(triplets)
+            break
 
     def semantic_page_summary_linkage(self):
         """
@@ -419,3 +458,47 @@ class SemanticKG:
             logger.error(f"Error in LLM caption mentions detection: {e}")
             logger.exception(e)
         return None
+
+    def llm_extract_triplet(self, text):
+        """
+        Extract the triplet from the text
+        Args:
+            text:
+
+        Returns:
+
+        """
+        try:
+            messages = [
+                {
+                    "role": "system",
+                    "content": """You are an assistant that can extract the triplets from a given text.
+                                """,
+                },
+                {
+                    "role": "user",
+                    "content": f"""
+                        Please extract the triplets from the following text:
+                        
+                        "{text}"
+                        
+                        Return the triplets within the json with the key "triplets".
+                        And the triplets should be in the format of a list of dictionaries,
+                        each dictionary should have the following keys:
+                        - subject
+                        - subject_ner_type
+                        - predicate
+                        - object
+                        - object_ner_type
+
+                    """,
+                },
+            ]
+            response, cost = openai_call(messages)
+            self.cost += cost
+            logger.debug(f"LLM cost: {cost}, response: {response}, text: {text}")
+            response_dict = json.loads(response)
+            return response_dict.get("triplets", [])
+        except Exception as e:
+            logger.error(f"Error in LLM triplet extraction: {e}")
+        return []
