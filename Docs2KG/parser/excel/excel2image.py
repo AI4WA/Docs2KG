@@ -26,12 +26,14 @@ class Excel2Image(ExcelParseBase):
         for sheet_name in xls.sheet_names:
             # Read the sheet into a DataFrame
             df = pd.read_excel(self.excel_filepath, sheet_name=sheet_name)
-            df.columns = ["" if col.startswith("Unnamed") else col for col in df.columns]
+            df.columns = [
+                "" if col.startswith("Unnamed") else col for col in df.columns
+            ]
             df = df.fillna("")  # Replace NaN values with an empty string
             # Convert the DataFrame to HTML
             html = df.to_html()
             # Save the HTML to an image file
-            imgkit.from_string(html, f'{self.image_output_dir}/{sheet_name}.png')
+            imgkit.from_string(html, f"{self.image_output_dir}/{sheet_name}.png")
             logger.info(f"Image saved to {self.image_output_dir}/{sheet_name}.png")
-            pdfkit.from_string(html, f'{self.image_output_dir}/{sheet_name}.pdf')
+            pdfkit.from_string(html, f"{self.image_output_dir}/{sheet_name}.pdf")
             logger.info(f"PDF saved to {self.image_output_dir}/{sheet_name}.pdf")

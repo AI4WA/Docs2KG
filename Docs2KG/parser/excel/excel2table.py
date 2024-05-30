@@ -31,7 +31,12 @@ class Excel2Table(ExcelParseBase):
             non_nan_count = row.count() - row.isna().sum()
             if non_nan_count >= min_non_nan:
                 # Check if subsequent rows have similar non-NaN counts
-                if df.iloc[i + 1:i + 5].apply(lambda x: x.count() - x.isna().sum(), axis=1).mean() >= min_non_nan:
+                if (
+                    df.iloc[i + 1 : i + 5]
+                    .apply(lambda x: x.count() - x.isna().sum(), axis=1)
+                    .mean()
+                    >= min_non_nan
+                ):
                     return i
         return 0
 

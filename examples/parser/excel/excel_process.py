@@ -1,5 +1,6 @@
 from Docs2KG.parser.excel.excel2image import Excel2Image
-from Docs2KG.parser.excel.excel2table import Excel2Table
+
+# from Docs2KG.parser.excel.excel2table import Excel2Table
 
 if __name__ == "__main__":
     excel_filename = "GCP_10002.xlsx"
