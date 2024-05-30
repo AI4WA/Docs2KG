@@ -40,7 +40,19 @@ HTML_TAGS = [
 class LayoutKG:
     """
     Layout Knowledge Graph
+
     This is for one pdf file
+
+
+    What we will link in the layout knowledge graph:
+
+    - Document KG
+        - Input is the Markdown JSON file
+        - The context order will be preserved within the Tree
+    - Link Image to Page
+    - Link Table to Page
+    - Link Image to Context (Find Nearby Context, then Map back to the Tree)
+    - Link Table to Context (Same, Find Caption, Nearby Context)
     """
 
     def __init__(
@@ -49,6 +61,7 @@ class LayoutKG:
     ):
         """
         Initialize the class with the pdf file
+
 
         Args:
             folder_path (Path): The path to the pdf file
@@ -350,15 +363,15 @@ class LayoutKG:
                 page_tree_table_node = table_nodes[table_index - 1]
 
             # give table node a linkage to the table_node
-
             for child in page_node["children"]:
                 if (
                     child["node_type"] == "table_csv"
                     and child["node_properties"]["table_index"] == row["table_index"]
                 ):
                     child["children"] = nearby_info
-                    # add the linkage from table_csv to table_tree_node
-                    child["linkage"] = [page_tree_table_node["uuid"]]
+                    if page_tree_table_node:
+                        # add the linkage from table_csv to table_tree_node
+                        child["linkage"] = [page_tree_table_node["uuid"]]
                     break
 
         self.export_kg()
@@ -367,14 +380,14 @@ class LayoutKG:
         """
         Export the knowledge graph to json file
         """
-        with open(self.kg_folder / "document_kg.json", "w") as f:
+        with open(self.kg_folder / "layout_kg.json", "w") as f:
             json.dump(self.kg_json, f, indent=2)
 
     def load_kg(self):
         """
         Load the knowledge graph from JSON
         """
-        with open(self.kg_folder / "document_kg.json", "r") as f:
+        with open(self.kg_folder / "layout_kg.json", "r") as f:
             self.kg_json = json.load(f)
 
     def get_page_node(self, page_number: int) -> Optional[dict]:
