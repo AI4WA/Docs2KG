@@ -145,7 +145,7 @@ class SemanticKG:
 
                             If there is a Figure XX, then we will search the context for Figure XX,
                             and link it back to the content
-                            Because the content have not been 
+                            Because the content have not been
                             """
 
                             uuids = self.util_caption_mentions_detect(caption=text)
@@ -426,7 +426,7 @@ class SemanticKG:
             messages = [
                 {
                     "role": "system",
-                    "content": """You are a system that 
+                    "content": """You are a system that help to detect if the text is a caption for an image or table.
                                 """,
                 },
                 {
@@ -434,16 +434,16 @@ class SemanticKG:
                     "content": f"""
                         Is the following text a caption for image or table?
                         You need to detect if the text is a caption for an image or table.
-         
+
                         Please return the result in JSON format as follows:
-                            - {'is_caption': 1} if it is a caption, 
+                            - {'is_caption': 1} if it is a caption,
                             - or {'is_caption': 0} if it is not a caption.
-                        
+
                         Some examples are captions for images or tables:
                         - "Figure 1.1: The distribution of the population"
                         - "Table 2.1: The distribution of the population"
                         - "Plate 1.1: The distribution of the population"
-                        - "Graph 1.1: The distribution of the population"    
+                        - "Graph 1.1: The distribution of the population"
 
                         "{text}"
                     """,
@@ -472,7 +472,7 @@ class SemanticKG:
             messages = [
                 {
                     "role": "system",
-                    "content": """You are an assistant that can detect the unique description 
+                    "content": """You are an assistant that can detect the unique description
                                   of a caption in a document.
                                 """,
                 },
@@ -480,14 +480,14 @@ class SemanticKG:
                     "role": "user",
                     "content": f"""
                         Please find the unique description of the caption in the document.
-                        
+
                         For example, if the caption is "Plate 1.1: The distribution of the population",
                         the unique description is "Plate 1.1".
-                        
+
                         Given caption:
-                        
+
                         "{caption}"
-                        
+
                         Return the str within the json with the key "uid".
                     """,
                 },
@@ -523,9 +523,9 @@ class SemanticKG:
                     "role": "user",
                     "content": f"""
                         Please extract the triplets from the following text:
-                        
+
                         "{text}"
-                        
+
                         Return the triplets within the json with the key "triplets".
                         And the triplets should be in the format of a list of dictionaries,
                         each dictionary should have the following keys:
@@ -568,9 +568,9 @@ class SemanticKG:
                     "role": "user",
                     "content": f"""
                         Please summarize the content of the page.
-                        
+
                         "{page_content}"
-                        
+
                         Return the summary within the json with the key "summary".
                     """,
                 },
