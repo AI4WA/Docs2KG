@@ -9,3 +9,6 @@ openai
 tqdm
 tiktoken
 openpyxl
+imgkit
+pillow
+pdfkit
