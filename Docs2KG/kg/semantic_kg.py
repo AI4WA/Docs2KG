@@ -2,6 +2,7 @@ import json
 import re
 from pathlib import Path
 from typing import List, Optional
+
 from tqdm import tqdm
 
 from Docs2KG.modules.llm.openai_call import openai_call
@@ -100,7 +101,7 @@ class SemanticKG:
         self.semantic_link_image_to_content()
         self.semantic_link_table_to_content()
         self.semantic_text2kg()
-        self.semantic_page_summary_linkage()
+        self.semantic_page_summary()
 
     def semantic_link_image_to_content(self):
         """
@@ -149,6 +150,7 @@ class SemanticKG:
 
                             uuids = self.util_caption_mentions_detect(caption=text)
                             logger.info(f"UUIDs: {uuids}")
+                            child["node_properties"]["mentioned_in"] = uuids
                             # TODO: ?pop out its own uuid, which should be within
                             for uuid in uuids:
                                 self.semantic_kg.append(
@@ -194,6 +196,7 @@ class SemanticKG:
                             child["node_properties"]["caption"] = text
                             uuids = self.util_caption_mentions_detect(caption=text)
                             logger.info(f"UUIDs: {uuids}")
+                            child["node_properties"]["mentioned_in"] = uuids
                             for uuid in uuids:
                                 self.semantic_kg.append(
                                     {
@@ -273,14 +276,27 @@ class SemanticKG:
             nodes.append(child)
         return nodes
 
-    def semantic_page_summary_linkage(self):
+    def semantic_page_summary(self):
         """
-        Link the summary across pages
+        Summary of the page, which will have better understanding of the page.
+
+        Not sure whether this will enhance the RAG or not.
+
+        But will be easier for human to understand the page.
+
+        When doing summary, also need to give up page and later page information
 
         Returns:
 
         """
-        pass
+        for page_index, page in enumerate(self.layout_kg["children"]):
+            if page["node_type"] == "page":
+                page_content = page["node_properties"]["page_text"]
+                logger.info(page_content)
+                summary = self.llm_page_summary(page_content)
+                page["node_properties"]["summary"] = summary
+
+        self.export_kg("layout")
 
     @staticmethod
     def load_kg(file_path: Path) -> dict:
@@ -486,14 +502,15 @@ class SemanticKG:
             logger.exception(e)
         return None
 
-    def llm_extract_triplet(self, text):
+    def llm_extract_triplet(self, text) -> List[dict]:
         """
         Extract the triplet from the text
         Args:
-            text:
+            text (str): The text to extract the triplets from
+
 
         Returns:
-
+            triplets (List[dict]): The list of triplets extracted from the text
         """
         try:
             messages = [
@@ -529,3 +546,42 @@ class SemanticKG:
         except Exception as e:
             logger.error(f"Error in LLM triplet extraction: {e}")
         return []
+
+    def llm_page_summary(self, page_content: str) -> str:
+        """
+
+        Args:
+            page_content (str): The content of the page
+
+        Returns:
+            summary (str): The summary of the page
+
+        """
+        try:
+            messages = [
+                {
+                    "role": "system",
+                    "content": """You are an assistant that can summarize the content of a page.
+                                """,
+                },
+                {
+                    "role": "user",
+                    "content": f"""
+                        Please summarize the content of the page.
+                        
+                        "{page_content}"
+                        
+                        Return the summary within the json with the key "summary".
+                    """,
+                },
+            ]
+            response, cost = openai_call(messages)
+            self.cost += cost
+            logger.debug(
+                f"LLM cost: {cost}, response: {response}, page_content: {page_content}"
+            )
+            response_dict = json.loads(response)
+            return response_dict.get("summary", "")
+        except Exception as e:
+            logger.error(f"Error in LLM page summary: {e}")
+        return ""
