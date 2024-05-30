@@ -1,10 +1,28 @@
 import json
+import re
 from pathlib import Path
+from typing import List, Optional
 
 from Docs2KG.modules.llm.openai_call import openai_call
 from Docs2KG.utils.get_logger import get_logger
 
 logger = get_logger(__name__)
+
+
+CAPTION_KEYWORDS = [
+    "fig",
+    "table",
+    "figure",
+    "tab",
+    "plate",
+    "chart",
+    "graph",
+    "plate",
+    "photo",
+    "image",
+    "diagram",
+    "illustration",
+]
 
 
 class SemanticKG:
@@ -68,7 +86,7 @@ class SemanticKG:
             raise FileNotFoundError(f"{self.layout_kg_file} does not exist")
         # load layout_kg
         self.layout_kg = self.load_kg(self.layout_kg_file)
-        self.semantic_kg = {}
+        self.semantic_kg = []
 
     def add_semantic_kg(self):
         """
@@ -111,10 +129,38 @@ class SemanticKG:
                             logger.info(f"Figure/Caption detected: {text}")
                             # we will use this
                             child["node_properties"]["caption"] = text
-                            continue
-        self.export_kg("layout")
+                            """
+                            Link the caption to where it is mentioned
 
-        # link the caption to the content where it is mentioned
+                            For example, if the caption is "Figure 1.1: The distribution of the population", then we will search the context
+                            And found out a place indicate that: as shown in Figure 1.1, the distribution of the population is ...
+
+                            We need to find a way to match it back to the content
+
+                            Current plan of attack, we use rule based way.
+
+                            If there is a Figure XX, then we will search the context for Figure XX, and link it back to the content
+                            Because the content have not been 
+                            """
+
+                            uuids = self.caption_mentions_detect(caption=text)
+                            logger.info(f"UUIDs: {uuids}")
+                            # TODO: ?pop out its own uuid, which should be within
+                            for uuid in uuids:
+                                self.semantic_kg.append(
+                                    {
+                                        "source_uuid": item["uuid"],  # uuid of image
+                                        "source_semantic": None,
+                                        "predicate": "mentioned_in",
+                                        "target_uuid": uuid,
+                                        "target_semantic": None,
+                                        "extraction_method": "rule_based",
+                                    }
+                                )
+                            continue
+
+        self.export_kg("layout")
+        self.export_kg("semantic")
 
     def semantic_link_table_to_content(self):
         """
@@ -141,7 +187,22 @@ class SemanticKG:
                             logger.info(f"Table/Caption detected: {text}")
                             # we will use this
                             child["node_properties"]["caption"] = text
+                            uuids = self.caption_mentions_detect(caption=text)
+                            logger.info(f"UUIDs: {uuids}")
+                            for uuid in uuids:
+                                self.semantic_kg.append(
+                                    {
+                                        "source_uuid": item["uuid"],  # uuid of table
+                                        "source_semantic": None,
+                                        "predicate": "mentioned_in",
+                                        "target_uuid": uuid,
+                                        "target_semantic": None,
+                                        "extraction_method": "rule_based",
+                                    }
+                                )
                             continue
+        self.export_kg("layout")
+        self.export_kg("semantic")
 
     def semantic_text2kg(self):
         """
@@ -198,8 +259,7 @@ class SemanticKG:
         Returns:
 
         """
-        caption_keywords = ["fig", "table", "figure", "tab", "plate", "chart", "graph"]
-        for keyword in caption_keywords:
+        for keyword in CAPTION_KEYWORDS:
             if keyword in text.lower():
                 return True
         # if self.llm_enabled:
@@ -242,4 +302,118 @@ class SemanticKG:
             return response_dict.get("is_caption", 0) == 1
         except Exception as e:
             logger.error(f"Error in LLM caption detection: {e}")
-            return False
+        return False
+
+    def caption_mentions_detect(self, caption: str) -> List[str]:
+        """
+
+        First we need to find the unique description for the caption.
+
+        For example: Plate 1.1: The distribution of the population
+
+        Plate 1.1 is the unique description
+
+        We will need to search the whole document to find the reference point
+
+        Args:
+            caption (str): The caption text
+
+
+        Returns:
+            uuids (List[str]): The list of uuids where the caption is mentioned
+
+        """
+        # first extract the unique description
+        # Extract the unique description from the caption
+        keyword_patten = "|".join(CAPTION_KEYWORDS)
+        match = re.search(rf"(\b({keyword_patten}) \d+(\.\d+)*\b)", caption.lower())
+        unique_description = None
+        if match:
+            unique_description = match.group(1)
+        else:
+            if self.llm_enabled:
+                """
+                Try to use LLM to do this work
+                """
+                unique_description = self.llm_detect_caption_mentions(caption)
+                logger.info(f"Unique description: {unique_description}")
+
+        if not unique_description:
+            return []
+        logger.info(f"Unique description: {unique_description}")
+        mentioned_uuids = []
+        # search the context
+        mentioned_uuids = self.mentioned_uuids(
+            self.layout_kg, unique_description, mentioned_uuids
+        )
+        return mentioned_uuids
+
+    def mentioned_uuids(
+        self, node: dict, unique_description: str, uuids: List[str]
+    ) -> List[str]:
+        """
+        Search the context for the unique description
+
+        Args:
+            node (dict): The node in the layout knowledge graph
+            unique_description (str): The unique description extracted from the caption
+            uuids (List[str]): The list of uuids where the unique description is mentioned
+
+        Returns:
+            uuids (List[str]): The list of uuids where the unique description is mentioned
+        """
+        for child in node["children"]:
+            if "node_properties" in child:
+                if "content" in child["node_properties"]:
+                    if (
+                        unique_description
+                        in child["node_properties"]["content"].lower()
+                    ):
+                        uuids.append(child["uuid"])
+            if "children" in child:
+                uuids = self.mentioned_uuids(child, unique_description, uuids)
+        return uuids
+
+    def llm_detect_caption_mentions(self, caption: str) -> Optional[str]:
+        """
+        Use LLM to detect the mentions of the given caption in the document.
+
+        Args:
+            caption (str): The caption text.
+
+        Returns:
+            List[str]: The list of uuids where the caption is mentioned.
+        """
+        try:
+            messages = [
+                {
+                    "role": "system",
+                    "content": """You are an assistant that can detect the unique description 
+                                  of a caption in a document.
+                                """,
+                },
+                {
+                    "role": "user",
+                    "content": f"""
+                        Please find the unique description of the caption in the document.
+                        
+                        For example, if the caption is "Plate 1.1: The distribution of the population",
+                        the unique description is "Plate 1.1".
+                        
+                        Given caption:
+                        
+                        "{caption}"
+                        
+                        Return the str within the json with the key "uid".
+                    """,
+                },
+            ]
+            response, cost = openai_call(messages)
+            self.cost += cost
+            logger.debug(f"LLM cost: {cost}, response: {response}, caption: {caption}")
+            response_dict = json.loads(response)
+            return response_dict.get("uid", "")
+        except Exception as e:
+            logger.error(f"Error in LLM caption mentions detection: {e}")
+            logger.exception(e)
+        return None
