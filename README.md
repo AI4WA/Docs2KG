@@ -2,6 +2,9 @@
 
 **An Open Source Framework for Transforming Unstructured Data into Unified Knowledge Graph**
 
+![Lint](https://github.com/AI4WA/Docs2KG/actions/workflows/lint.yml/badge.svg)
+![Documentation](https://github.com/AI4WA/Docs2KG/actions/workflows/docs.yml/badge.svg)
+
 Three pillars of the LLM applications in our opinion:
 
 - Data
