@@ -108,21 +108,40 @@ class SemanticKG:
                         # if this is the caption, then we will extract the text
                         text = item["node_properties"]["content"]
                         if self.caption_detection(text):
-                            logger.info(f"Caption detected: {text}")
+                            logger.info(f"Figure/Caption detected: {text}")
                             # we will use this
                             child["node_properties"]["caption"] = text
                             continue
-
         self.export_kg("layout")
+
+        # link the caption to the content where it is mentioned
 
     def semantic_link_table_to_content(self):
         """
         Link the table to the content
 
+        So we will do the same thing first for the table
+
         Returns:
 
         """
-        pass
+        for page in self.layout_kg["children"]:
+            # within the page node, then it should have the children start with the image node
+            for child in page["children"]:
+                if child["node_type"] == "table_csv":
+                    # child now is the image node
+                    # if this child do not have children, then we will skip
+                    if "children" not in child or len(child["children"]) == 0:
+                        continue
+                    # logger.info(child)
+                    for item in child["children"]:
+                        # if this is the caption, then we will extract the text
+                        text = item["node_properties"]["content"]
+                        if self.caption_detection(text):
+                            logger.info(f"Table/Caption detected: {text}")
+                            # we will use this
+                            child["node_properties"]["caption"] = text
+                            continue
 
     def semantic_text2kg(self):
         """
