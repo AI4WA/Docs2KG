@@ -3,7 +3,6 @@ import os
 import re
 
 import pandas as pd
-from bs4 import BeautifulSoup
 
 from Docs2KG.parser.email.base import EmailParseBase
 from Docs2KG.utils.get_logger import get_logger
@@ -43,7 +42,7 @@ class Email2Table(EmailParseBase):
         table_index = 0
 
         for part in msg.walk():
-            content_type = part.get_content_type()
+            # content_type = part.get_content_type()
 
             # Handle HTML content
             # TODO: Not working as expected

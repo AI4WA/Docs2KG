@@ -1,6 +1,7 @@
 from Docs2KG.parser.email.email2images import Email2Images
 from Docs2KG.parser.email.email2markdown import Email2Markdown
-from Docs2KG.parser.email.email2table import Email2Table
+
+# from Docs2KG.parser.email.email2table import Email2Table
 
 if __name__ == "__main__":
     email_filename = "UWA Sport eNews _ April 2024.eml"

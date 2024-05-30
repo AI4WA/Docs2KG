@@ -12,3 +12,7 @@ openpyxl
 imgkit
 pillow
 pdfkit
+transformers
+torch
+sentence-transformers
+openpyxl

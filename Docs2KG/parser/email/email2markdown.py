@@ -45,4 +45,4 @@ class Email2Markdown(EmailParseBase):
             markdown_content = f"""### From: {from_}\n\n### To: {to}\n\n### Subject: {subject}\n\n### Date: {date}\n\n---\n\n{body}"""
             with open(self.markdown_filepath, "w") as markdown_file:
                 markdown_file.write(markdown_content)
-            logger.info(f"Converted!")
+            logger.info("Converted!")
