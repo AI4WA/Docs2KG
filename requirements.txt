@@ -8,6 +8,10 @@ tabulate
 openai
 tqdm
 tiktoken
+openpyxl
+imgkit
+pillow
+pdfkit
 transformers
 torch
 sentence-transformers
