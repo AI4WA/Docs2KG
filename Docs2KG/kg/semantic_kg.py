@@ -3,6 +3,8 @@ import re
 from pathlib import Path
 from typing import List, Optional
 
+from tqdm import tqdm
+
 from Docs2KG.modules.llm.openai_call import openai_call
 from Docs2KG.utils.get_logger import get_logger
 
@@ -99,7 +101,7 @@ class SemanticKG:
         self.semantic_link_image_to_content()
         self.semantic_link_table_to_content()
         self.semantic_text2kg()
-        self.semantic_page_summary_linkage()
+        self.semantic_page_summary()
 
     def semantic_link_image_to_content(self):
         """
@@ -125,26 +127,30 @@ class SemanticKG:
                     for item in child["children"]:
                         # if this is the caption, then we will extract the text
                         text = item["node_properties"]["content"]
-                        if self.caption_detection(text):
+                        if self.util_caption_detection(text):
                             logger.info(f"Figure/Caption detected: {text}")
                             # we will use this
                             child["node_properties"]["caption"] = text
                             """
                             Link the caption to where it is mentioned
 
-                            For example, if the caption is "Figure 1.1: The distribution of the population", then we will search the context
-                            And found out a place indicate that: as shown in Figure 1.1, the distribution of the population is ...
+                            For example, if the caption is "Figure 1.1: The distribution of the population",
+                            then we will search the context
+                            And found out a place indicate that: as shown in Figure 1.1,
+                            the distribution of the population is ...
 
                             We need to find a way to match it back to the content
 
                             Current plan of attack, we use rule based way.
 
-                            If there is a Figure XX, then we will search the context for Figure XX, and link it back to the content
+                            If there is a Figure XX, then we will search the context for Figure XX,
+                            and link it back to the content
                             Because the content have not been 
                             """
 
-                            uuids = self.caption_mentions_detect(caption=text)
+                            uuids = self.util_caption_mentions_detect(caption=text)
                             logger.info(f"UUIDs: {uuids}")
+                            child["node_properties"]["mentioned_in"] = uuids
                             # TODO: ?pop out its own uuid, which should be within
                             for uuid in uuids:
                                 self.semantic_kg.append(
@@ -152,6 +158,7 @@ class SemanticKG:
                                         "source_uuid": item["uuid"],  # uuid of image
                                         "source_semantic": None,
                                         "predicate": "mentioned_in",
+                                        "predicate_desc": None,
                                         "target_uuid": uuid,
                                         "target_semantic": None,
                                         "extraction_method": "rule_based",
@@ -183,18 +190,20 @@ class SemanticKG:
                     for item in child["children"]:
                         # if this is the caption, then we will extract the text
                         text = item["node_properties"]["content"]
-                        if self.caption_detection(text):
+                        if self.util_caption_detection(text):
                             logger.info(f"Table/Caption detected: {text}")
                             # we will use this
                             child["node_properties"]["caption"] = text
-                            uuids = self.caption_mentions_detect(caption=text)
+                            uuids = self.util_caption_mentions_detect(caption=text)
                             logger.info(f"UUIDs: {uuids}")
+                            child["node_properties"]["mentioned_in"] = uuids
                             for uuid in uuids:
                                 self.semantic_kg.append(
                                     {
                                         "source_uuid": item["uuid"],  # uuid of table
                                         "source_semantic": None,
                                         "predicate": "mentioned_in",
+                                        "predicate_desc": None,
                                         "target_uuid": uuid,
                                         "target_semantic": None,
                                         "extraction_method": "rule_based",
@@ -206,21 +215,88 @@ class SemanticKG:
 
     def semantic_text2kg(self):
         """
-        Link the text to the knowledge graph
+        ## General Goal of this:
+
+        - A list of triplet: (subject, predicate, object)
+        - Triplets will be associated to the tree
+        - Frequent subject will be merged, and linked
+
+        Plan of attack:
+
+        1. We need to do the Named Entity Recognition for each sentence
+        2. Do NER coexist relationship
+        3. Last step will be extracting the semantic NER vs NER relationship
+
+        How to construction the relation?
+
+        - We will grab the entities mapping to text uuid
+        {
+           "ner_type": {
+            "entities": [uuid1, uuid2]
+           }
+        }
+
+        """
+        if self.llm_enabled:
+            current_cost = self.cost
+            # do the triple extraction
+            # self.semantic_triplet_extraction(self.layout_kg)
+            logger.info("Start the semantic text2kg extraction")
+            nodes = self.semantic_triplet_extraction(self.layout_kg, [])
+            # use tqdm to show the progress
+            for node in tqdm(nodes, desc="Extracting triplets"):
+                # extract the triplets from the text
+                text = node["node_properties"]["content"]
+                triplets = self.llm_extract_triplet(text)
+                node["node_properties"]["text2kg"] = triplets
+            self.export_kg("layout")
+            logger.info(f"LLM cost: {self.cost - current_cost}")
+        else:
+            # Hard to do this without LLM
+            logger.info("LLM is not enabled, skip the semantic text2kg extraction")
+
+    def semantic_triplet_extraction(self, node: dict, nodes: List[dict]):
+        """
+        Extract tripplets from the text
+
+        It will update the node with the Text2KG field, add a list of triplets
+        Args:
+            node (dict): The node in the layout knowledge graph
+            nodes (List[dict]): The list of nodes
 
         Returns:
 
         """
-        pass
+        for child in node["children"]:
+            if "children" in child:
+                nodes = self.semantic_triplet_extraction(child, nodes)
+            content = child["node_properties"].get("content", "")
+            if not content:
+                continue
+            nodes.append(child)
+        return nodes
 
-    def semantic_page_summary_linkage(self):
+    def semantic_page_summary(self):
         """
-        Link the summary across pages
+        Summary of the page, which will have better understanding of the page.
+
+        Not sure whether this will enhance the RAG or not.
+
+        But will be easier for human to understand the page.
+
+        When doing summary, also need to give up page and later page information
 
         Returns:
 
         """
-        pass
+        for page_index, page in enumerate(self.layout_kg["children"]):
+            if page["node_type"] == "page":
+                page_content = page["node_properties"]["page_text"]
+                logger.info(page_content)
+                summary = self.llm_page_summary(page_content)
+                page["node_properties"]["summary"] = summary
+
+        self.export_kg("layout")
 
     @staticmethod
     def load_kg(file_path: Path) -> dict:
@@ -248,7 +324,7 @@ class SemanticKG:
             with open(self.layout_kg_file, "w") as f:
                 json.dump(self.layout_kg, f, indent=4)
 
-    def caption_detection(self, text: str) -> bool:  # noqa
+    def util_caption_detection(self, text: str) -> bool:  # noqa
         """
         Give a text, detect if this is a caption for image or table
 
@@ -266,45 +342,7 @@ class SemanticKG:
         #     return self.llm_detect_caption(text)
         return False
 
-    def llm_detect_caption(self, text: str) -> bool:
-        """
-        Use LLM to detect whether the given text is a caption for an image or table.
-
-        Args:
-            text (str): The text to be evaluated.
-
-        Returns:
-            bool: True if the text is identified as a caption, False otherwise.
-        """
-        try:
-            messages = [
-                {
-                    "role": "system",
-                    "content": """You are a system that detects if a given text is a caption for an image or table.
-                                  Please return the result in JSON format as follows:
-                                  - {'is_caption': 1} if it is a caption, 
-                                  - or {'is_caption': 0} if it is not a caption.
-                                """,
-                },
-                {
-                    "role": "user",
-                    "content": f"""
-                        Is the following text a caption for image or table?
-    
-                        "{text}"
-                    """,
-                },
-            ]
-            response, cost = openai_call(messages)
-            self.cost += cost
-            logger.debug(f"LLM cost: {cost}, response: {response}, text: {text}")
-            response_dict = json.loads(response)
-            return response_dict.get("is_caption", 0) == 1
-        except Exception as e:
-            logger.error(f"Error in LLM caption detection: {e}")
-        return False
-
-    def caption_mentions_detect(self, caption: str) -> List[str]:
+    def util_caption_mentions_detect(self, caption: str) -> List[str]:
         """
 
         First we need to find the unique description for the caption.
@@ -343,12 +381,12 @@ class SemanticKG:
         logger.info(f"Unique description: {unique_description}")
         mentioned_uuids = []
         # search the context
-        mentioned_uuids = self.mentioned_uuids(
+        mentioned_uuids = self.util_mentioned_uuids(
             self.layout_kg, unique_description, mentioned_uuids
         )
         return mentioned_uuids
 
-    def mentioned_uuids(
+    def util_mentioned_uuids(
         self, node: dict, unique_description: str, uuids: List[str]
     ) -> List[str]:
         """
@@ -371,8 +409,54 @@ class SemanticKG:
                     ):
                         uuids.append(child["uuid"])
             if "children" in child:
-                uuids = self.mentioned_uuids(child, unique_description, uuids)
+                uuids = self.util_mentioned_uuids(child, unique_description, uuids)
         return uuids
+
+    def llm_detect_caption(self, text: str) -> bool:
+        """
+        Use LLM to detect whether the given text is a caption for an image or table.
+
+        Args:
+            text (str): The text to be evaluated.
+
+        Returns:
+            bool: True if the text is identified as a caption, False otherwise.
+        """
+        try:
+            messages = [
+                {
+                    "role": "system",
+                    "content": """You are a system that 
+                                """,
+                },
+                {
+                    "role": "user",
+                    "content": f"""
+                        Is the following text a caption for image or table?
+                        You need to detect if the text is a caption for an image or table.
+         
+                        Please return the result in JSON format as follows:
+                            - {'is_caption': 1} if it is a caption, 
+                            - or {'is_caption': 0} if it is not a caption.
+                        
+                        Some examples are captions for images or tables:
+                        - "Figure 1.1: The distribution of the population"
+                        - "Table 2.1: The distribution of the population"
+                        - "Plate 1.1: The distribution of the population"
+                        - "Graph 1.1: The distribution of the population"    
+
+                        "{text}"
+                    """,
+                },
+            ]
+            response, cost = openai_call(messages)
+            self.cost += cost
+            logger.debug(f"LLM cost: {cost}, response: {response}, text: {text}")
+            response_dict = json.loads(response)
+            return response_dict.get("is_caption", 0) == 1
+        except Exception as e:
+            logger.error(f"Error in LLM caption detection: {e}")
+        return False
 
     def llm_detect_caption_mentions(self, caption: str) -> Optional[str]:
         """
@@ -417,3 +501,87 @@ class SemanticKG:
             logger.error(f"Error in LLM caption mentions detection: {e}")
             logger.exception(e)
         return None
+
+    def llm_extract_triplet(self, text) -> List[dict]:
+        """
+        Extract the triplet from the text
+        Args:
+            text (str): The text to extract the triplets from
+
+
+        Returns:
+            triplets (List[dict]): The list of triplets extracted from the text
+        """
+        try:
+            messages = [
+                {
+                    "role": "system",
+                    "content": """You are an assistant that can extract the triplets from a given text.
+                                """,
+                },
+                {
+                    "role": "user",
+                    "content": f"""
+                        Please extract the triplets from the following text:
+                        
+                        "{text}"
+                        
+                        Return the triplets within the json with the key "triplets".
+                        And the triplets should be in the format of a list of dictionaries,
+                        each dictionary should have the following keys:
+                        - subject
+                        - subject_ner_type
+                        - predicate
+                        - object
+                        - object_ner_type
+
+                    """,
+                },
+            ]
+            response, cost = openai_call(messages)
+            self.cost += cost
+            logger.debug(f"LLM cost: {cost}, response: {response}, text: {text}")
+            response_dict = json.loads(response)
+            return response_dict.get("triplets", [])
+        except Exception as e:
+            logger.error(f"Error in LLM triplet extraction: {e}")
+        return []
+
+    def llm_page_summary(self, page_content: str) -> str:
+        """
+
+        Args:
+            page_content (str): The content of the page
+
+        Returns:
+            summary (str): The summary of the page
+
+        """
+        try:
+            messages = [
+                {
+                    "role": "system",
+                    "content": """You are an assistant that can summarize the content of a page.
+                                """,
+                },
+                {
+                    "role": "user",
+                    "content": f"""
+                        Please summarize the content of the page.
+                        
+                        "{page_content}"
+                        
+                        Return the summary within the json with the key "summary".
+                    """,
+                },
+            ]
+            response, cost = openai_call(messages)
+            self.cost += cost
+            logger.debug(
+                f"LLM cost: {cost}, response: {response}, page_content: {page_content}"
+            )
+            response_dict = json.loads(response)
+            return response_dict.get("summary", "")
+        except Exception as e:
+            logger.error(f"Error in LLM page summary: {e}")
+        return ""
