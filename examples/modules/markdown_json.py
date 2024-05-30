@@ -6,6 +6,6 @@ if __name__ == "__main__":
 
     markdown2json = LLMMarkdown2Json(
         input_md_file,
-        llm_model_name="gpt-4o",
+        llm_model_name="gpt-3.5-turbo",
     )
     markdown2json.extract2json()

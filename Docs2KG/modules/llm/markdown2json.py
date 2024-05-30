@@ -2,11 +2,10 @@ from pathlib import Path
 from typing import List
 
 import pandas as pd
-from openai import OpenAI
 from tqdm import tqdm
 
+from Docs2KG.modules.llm.openai_call import openai_call
 from Docs2KG.utils.get_logger import get_logger
-from Docs2KG.utils.llm.track_usage import track_usage
 
 tqdm.pandas()
 
@@ -34,7 +33,6 @@ class LLMMarkdown2Json:
             raise ValueError("Only support csv")
         self.json_csv_file = markdown_file.with_suffix(".json.csv")
         self.llm_model_name = llm_model_name
-        self.client = OpenAI()
         self.cost = 0
 
     def extract2json(self):
@@ -362,34 +360,6 @@ class LLMMarkdown2Json:
         Returns:
             response_json_str (str): The response from the OpenAI API
         """
-        result_json_str = ""
-        while True:
-            response = self.client.chat.completions.create(
-                model=self.llm_model_name,
-                response_format={"type": "json_object"},
-                messages=messages,
-            )
-            logger.debug(response)
-            content = response.choices[0].message.content
-            logger.debug(content)
-            result_json_str += content
-            self.cost += track_usage(response)
-            # if finish_reason is length, then it is not complete
-            logger.debug(response.choices[0].finish_reason)
-            if response.choices[0].finish_reason != "length":
-                break
-            else:
-                messages.append(
-                    {
-                        "role": "assistant",
-                        "content": content,
-                    }
-                )
-                messages.append(
-                    {
-                        "role": "user",
-                        "content": "Continue the response",
-                    }
-                )
-
+        result_json_str, cost = openai_call(messages, self.llm_model_name)
+        self.cost += cost
         return result_json_str
