@@ -1,8 +1,9 @@
+import imgkit
 import pandas as pd
+import pdfkit
+
 from Docs2KG.parser.excel.base import ExcelParseBase
 from Docs2KG.utils.get_logger import get_logger
-import imgkit
-import pdfkit
 
 logger = get_logger(__name__)
 

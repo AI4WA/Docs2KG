@@ -1,4 +1,5 @@
 import pandas as pd
+
 from Docs2KG.parser.excel.base import ExcelParseBase
 from Docs2KG.utils.get_logger import get_logger
 
