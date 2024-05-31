@@ -9,7 +9,7 @@ src = root / "Docs2KG"
 
 for path in sorted(src.rglob("*.py")):
     module_path = path.relative_to(src).with_suffix("")
-    full_doc_path = "Sources" / module_path.with_suffix(".md")
+    full_doc_path = "sources" / module_path.with_suffix(".md")
 
     parts = tuple(module_path.parts)
 
@@ -17,19 +17,19 @@ for path in sorted(src.rglob("*.py")):
         # parts = parts[:-1]
         # get this to be the index html under this folder
         # replace the __init__ with index
-        identifier = ".".join(parts[:-1])
-        parts = parts[:-1] + ("main",)
-        full_doc_path = "Sources" / module_path.parent / "main.md"
-        if identifier == "":
-            print(
-                "::: Docs2KG",
-                file=mkdocs_gen_files.open(full_doc_path, "w"),
-            )
-        else:
-            print(
-                f"::: Docs2KG.{identifier}",
-                file=mkdocs_gen_files.open(full_doc_path, "w"),
-            )
+        # identifier = ".".join(parts[:-1])
+        # parts = parts[:-1] + ("main",)
+        # full_doc_path = "sources" / module_path.parent / "index.md"
+        # if identifier == "":
+        #     print(
+        #         "::: Docs2KG",
+        #         file=mkdocs_gen_files.open(full_doc_path, "w"),
+        #     )
+        # else:
+        #     print(
+        #         f"::: Docs2KG.{identifier}",
+        #         file=mkdocs_gen_files.open(full_doc_path, "w"),
+        #     )
         continue
     elif parts[-1] == "__main__":
         continue
@@ -37,5 +37,32 @@ for path in sorted(src.rglob("*.py")):
     with mkdocs_gen_files.open(full_doc_path, "w") as fd:
         identifier = ".".join(parts)
         print(f"::: Docs2KG.{identifier}", file=fd)
+
+    mkdocs_gen_files.set_edit_path(full_doc_path, path.relative_to(root))
+
+
+src = root / "examples"
+
+# Loop through all .py files in the source directory
+for path in sorted(src.rglob("*.py")):
+    module_path = path.relative_to(src).with_suffix("")
+    full_doc_path = Path("examples") / module_path.with_suffix(".md")
+
+    parts = tuple(module_path.parts)
+
+    # Skip __init__.py files
+    if parts[-1] == "__init__":
+        continue
+
+    with mkdocs_gen_files.open(full_doc_path, "w") as fd:
+
+        fd.write("## Code Example\n\n")
+        fd.write("```python\n")
+        with open(path) as main_file:
+            fd.write(main_file.read())
+        fd.write("\n```\n")
+
+        identifier = ".".join(parts)
+        print(f"::: examples.{identifier}", file=fd)
 
     mkdocs_gen_files.set_edit_path(full_doc_path, path.relative_to(root))

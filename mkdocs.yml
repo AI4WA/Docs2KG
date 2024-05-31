@@ -21,6 +21,8 @@ plugins:
           rendering:
             show_source: true
             show_source_link: true
+
+
 extra:
   social:
     - icon: fontawesome/brands/github
