@@ -16,3 +16,4 @@ transformers
 torch
 sentence-transformers
 openpyxl
+neo4j

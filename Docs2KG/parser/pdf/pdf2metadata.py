@@ -8,9 +8,9 @@ from Docs2KG.parser.pdf.constants import (
     PDF_TYPE_EXPORTED,
     PDF_TYPE_SCANNED,
 )
-from Docs2KG.utils.count_tokens import count_tokens
-from Docs2KG.utils.estimate_price import estimate_price
 from Docs2KG.utils.get_logger import get_logger
+from Docs2KG.utils.llm.count_tokens import count_tokens
+from Docs2KG.utils.llm.estimate_price import estimate_price
 
 logger = get_logger(__name__)
 
@@ -69,8 +69,8 @@ def get_meda_for_file(pdf_file: Path) -> dict:
         texts.append(page.get_text())
     metadata["text_token"] = count_tokens(" ".join(texts))
     # estimate the price
-    metadata["estimated_price_3.5"] = estimate_price(metadata["text_token"])
-    metadata["estimated_price_4o"] = estimate_price(
+    metadata["estimated_price_gpt35"] = estimate_price(metadata["text_token"])
+    metadata["estimated_price_gpt4o"] = estimate_price(
         metadata["text_token"], model_name="gpt-4o"
     )
     metadata["estimated_price_4_turbo"] = estimate_price(
