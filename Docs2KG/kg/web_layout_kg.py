@@ -106,61 +106,58 @@ class WebLayoutKG:
             dict: Knowledge graph in JSON format
 
         """
+        # FIXME: still not working properly
+        node = {
+            "uuid": str(uuid4()),
+            "children": [],
+        }
+
+        for child in soup.children:
+            if child.name is not None and soup.name != "table":
+                child_node = self.extract_kg(child)
+                node["children"].append(child_node)
         # content should be text if exists, if not, leave ""
-        content = str(soup.contents[0]) if soup.contents else ""
+        content = str(soup.text) if soup.text is not None else ""
+        content = content.strip()
         logger.info(content)
         logger.info(soup.name)
-
         # if there is no parent, then it is the root node, which we call it document
         node_type = str(soup.name) if soup.name is not None else "text"
         if "document" in node_type:
             node_type = "document"
-        node = {
-            "uuid": str(uuid4()),
-            "node_type": node_type,
-            "node_properties": {
-                "content": content,
-                # unpack all other properties
-                **soup.attrs,
-            },
-            "children": [],
-        }
-        for child in soup.children:
-            if child.name is not None:
-                child_node = self.extract_kg(child)
-                # if it is a image tag, then extract the image and save it to the output directory
-                if child.name == "img":
-                    img_url = child.get("src")
-                    if not img_url.startswith("http"):
-                        img_url = self.domain + img_url
-                    img_data = requests.get(img_url).content
-                    img_name = img_url.split("/")[-1]
-                    logger.info("image_url")
-                    logger.info(img_url)
-                    if "?" in img_name:
-                        img_name = img_name.split("?")[0]
-                    with open(f"{self.output_dir}/images/{img_name}", "wb") as f:
-                        f.write(img_data)
-                    logger.info(f"Extracted the HTML file from {self.url} to images")
-                    child_node["node_properties"][
-                        "img_path"
-                    ] = f"{self.output_dir}/images/{img_name}"
-                # if it is a table tag, then extract the table and save it to the output directory
-                if child.name == "table":
-                    rows = []
-                    for row in child.find_all("tr"):
-                        cells = [
-                            cell.get_text(strip=True)
-                            for cell in row.find_all(["th", "td"])
-                        ]
-                        rows.append(cells)
-                    df = pd.DataFrame(
-                        rows[1:], columns=rows[0]
-                    )  # Assuming first row is header
-                    csv_filename = f"{self.output_dir}/tables/{child_node['uuid']}.csv"
-                    df.to_csv(csv_filename, index=False)
-                    logger.info(f"Extracted the HTML file from {self.url} to tables")
-                node["children"].append(child_node)
+
+        node["node_type"] = node_type
+        node["node_properties"] = {"content": content, **soup.attrs}
+        # if it is an image tag, then extract the image and save it to the output directory
+        if soup.name == "img":
+            img_url = soup.get("src")
+            if not img_url.startswith("http"):
+                img_url = self.domain + img_url
+            img_data = requests.get(img_url).content
+            img_name = img_url.split("/")[-1]
+            logger.info("image_url")
+            logger.info(img_url)
+            if "?" in img_name:
+                img_name = img_name.split("?")[0]
+            with open(f"{self.output_dir}/images/{img_name}", "wb") as f:
+                f.write(img_data)
+            logger.info(f"Extracted the HTML file from {self.url} to images")
+            node["node_properties"]["img_path"] = f"{self.output_dir}/images/{img_name}"
+        # if it is a table tag, then extract the table and save it to the output directory
+        if soup.name == "table":
+            rows = []
+            for row in soup.find_all("tr"):
+                cells = [
+                    cell.get_text(strip=True) for cell in row.find_all(["th", "td"])
+                ]
+                rows.append(cells)
+            df = pd.DataFrame(rows[1:], columns=rows[0])  # Assuming first row is header
+            csv_filename = f"{self.output_dir}/tables/{node['uuid']}.csv"
+            df.to_csv(csv_filename, index=False)
+            logger.info(f"Extracted the HTML file from {self.url} to tables")
+            node["node_properties"]["table_path"] = csv_filename
+        # remove the node from soup after extracting the image and table
+        soup.extract()
         return node
 
     def export_kg(self) -> None:
