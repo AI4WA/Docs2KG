@@ -1,4 +1,4 @@
-from Docs2KG.kg.json2triplets import JSON2Triplets
+from Docs2KG.kg.utils.json2triplets import JSON2Triplets
 from Docs2KG.utils.constants import DATA_OUTPUT_DIR
 
 if __name__ == "__main__":
