@@ -100,6 +100,9 @@ class LayoutKG:
             self.link_table_to_page()
             self.link_image_to_context()
             self.link_table_to_context()
+        else:
+            # add page image
+            self.link_page_image_to_page()
 
     def document_kg(self):
         """
@@ -199,6 +202,34 @@ class LayoutKG:
             page_node["children"].append(image_node)
 
         self.export_kg()
+
+    def link_page_image_to_page(self):
+        page_images_file = self.folder_path / "images" / "page_images.csv"
+        page_images_df = pd.read_csv(page_images_file)
+        for index, row in page_images_df.iterrows():
+            page_number = row["page_number"]
+            page_node = self.get_page_node(page_number)
+            if not page_node:
+                logger.info(f"Page {page_number} not found, adding a new page node")
+                page_node = {
+                    "node_type": "page",
+                    "uuid": str(uuid4()),
+                    "node_properties": {
+                        "page_number": page_number,
+                        "page_text": "",
+                    },
+                    "children": [],
+                }
+                self.kg_json["children"].append(page_node)
+            image_node = {
+                "node_type": "page_image",
+                "uuid": str(uuid4()),
+                "node_properties": {
+                    "image_path": row["image_path"],
+                },
+                "children": [],
+            }
+            page_node["children"].append(image_node)
 
     def link_table_to_page(self):
         """
