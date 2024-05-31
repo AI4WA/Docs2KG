@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import List
+from typing import List, Optional
 
 import pandas as pd
 from tqdm import tqdm
@@ -36,45 +36,32 @@ class LLMMarkdown2Json:
         self.llm_model_name = llm_model_name
         self.cost = 0
 
-    def clean_markdown(self, markdown: str) -> str:
+    def clean_markdown(self) -> Optional[str]:
         """
         Prompt will give the LLM Markdown text
 
         Ask it clean it, and then get the Markdown into proper format
 
-        Args:
-            markdown (str): The Markdown text
-
         Returns:
             str: The cleaned Markdown text
         """
-        messages = [
-            {
-                "role": "system",
-                "content": """You are a helpful assistant to clean the markdown text.""",
-            },
-            {
-                "role": "user",
-                "content": f"""
-                            Clean the markdown.
-                            - Remove noise characters: not meaningful characters or information, for example
-                                something like "I"
-                            - Make sure the markdown is fit with the markdown format
-                            - Only do remove for the noise characters, do not change any content
-                            Clean the following markdown text:\n\n{markdown}
-                            Output it in json format
-                            with a key "cleaned_markdown"
-                            """,
-            },
-        ]
-        res_json_str = self.openai_call(messages)
-        res_json = json.loads(res_json_str)
-        return res_json.get("cleaned_markdown", None)
+        current_cost = self.cost
+        cleaned_markdown_csv = self.markdown_file.with_suffix(".cleaned.csv")
+        if cleaned_markdown_csv.exists():
+            logger.info(f"{cleaned_markdown_csv} already exists")
+            return
+        df = pd.read_csv(self.markdown_file)
+        for index, row in tqdm(df.iterrows(), total=df.shape[0], desc="Layout JSON"):
+            cleaned_markdown = self.openai_clean_markdown(row["text"])
+            df.at[index, "text"] = cleaned_markdown
+        df.to_csv(cleaned_markdown_csv, index=False)
+        logger.info(f"Cost: {self.cost - current_cost}")
 
     def extract2json(self):
         if self.json_csv_file.exists():
             logger.info(f"{self.json_csv_file} already exists")
             return
+        logger.info(self.markdown_file)
         current_cost = self.cost
         df = pd.read_csv(self.markdown_file)
 
@@ -85,6 +72,48 @@ class LLMMarkdown2Json:
 
         df.to_csv(self.json_csv_file, index=False)
         logger.info(f"Cost: {self.cost - current_cost}")
+
+    def openai_clean_markdown(self, markdown):
+        """
+        Use OpenAI LLM to clean the markdown
+
+        The markdown will be cleaned using the OpenAI LLM
+
+        Args:
+            markdown (str): The Markdown text
+
+        Returns:
+            str: The cleaned Markdown text
+        """
+        try:
+            messages = [
+                {
+                    "role": "system",
+                    "content": """You are a helpful assistant to clean the markdown text.""",
+                },
+                {
+                    "role": "user",
+                    "content": f"""
+                                Clean the markdown.
+                                - Remove the content which is not meaningful, such as a single I character, etc
+                                - Do not need to keep special characters, such as `#`, `*`, etc, only keep
+                                    meaningful content
+                                - Make sure the markdown is fit with the markdown format
+                                - Only do remove for the noise characters, do not change any content
+                                Clean the following markdown text:\n\n{markdown}
+                                Output should be a cleaned markdown text, which in str format
+
+                                It will stay in the response in json format
+                                with a key "cleaned_markdown"
+                                """,
+                },
+            ]
+            markdown_json = self.llm_openai_call(messages)
+            logger.info(markdown_json)
+            return json.loads(markdown_json).get("cleaned_markdown", None)
+        except Exception as e:
+            logger.exception(e)
+            return None
 
     def openai_layout_json(self, markdown):
         """
@@ -227,8 +256,8 @@ class LLMMarkdown2Json:
                 "role": "system",
                 "content": """You are a helpful assistant to convert markdown to JSON format.
 
-        The markdown given to you will have some noise/not meaningful characters or information, you need to think about cleaning
-        the markdown into a cleaned version.
+        The markdown given to you will have some noise/not meaningful characters or information, you need to think
+        about cleaning the markdown into a cleaned version.
 
         Then convert the markdown to json
 
@@ -357,7 +386,7 @@ class LLMMarkdown2Json:
                 "content": f"Convert the following markdown to JSON format:\n\n{markdown}",
             },
         ]
-        return self.openai_call(messages)
+        return self.llm_openai_call(messages)
 
     def openai_content_json(self, markdown: str):
         """
@@ -384,9 +413,9 @@ class LLMMarkdown2Json:
                 "content": f"Convert the following markdown to JSON format:\n\n{markdown}",
             },
         ]
-        return self.openai_call(messages)
+        return self.llm_openai_call(messages)
 
-    def openai_call(self, messages: List[dict]) -> str:
+    def llm_openai_call(self, messages: List[dict]) -> str:
         """
         Call the OpenAI API to get the response
         Args:

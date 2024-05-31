@@ -9,6 +9,7 @@ logger = get_logger(__name__)
 
 if __name__ == "__main__":
     pdf_file = DATA_INPUT_DIR / "3.pdf"
+    output_folder = DATA_OUTPUT_DIR / "3.pdf"
     scanned_or_exported = get_scanned_or_exported(pdf_file)
     if scanned_or_exported == PDF_TYPE_SCANNED:
         logger.info(
@@ -25,7 +26,4 @@ if __name__ == "__main__":
             llm_model_name="gpt-3.5-turbo",
         )
         logger.info("Cleaning the markdown file")
-        cleaned_markdown = ll_markdown2json.clean_markdown(md_text["md"])
-        logger.info(cleaned_markdown)
-        with open(DATA_OUTPUT_DIR / "3.pdf" / "texts" / "cleaned_md.md", "w") as f:
-            f.write(cleaned_markdown)
+        ll_markdown2json.clean_markdown()
