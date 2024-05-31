@@ -4,12 +4,10 @@ from Docs2KG.parser.web.web2tables import Web2Tables
 
 if __name__ == "__main__":
     url = "https://abs.gov.au/census/find-census-data/quickstats/2021/LGA57080"
-    web2md = Web2Markdown(urls=[url])
-    web2imgs = Web2Images(urls=[url])
-    web2tables = Web2Tables(urls=[url])
+    web_2_md = Web2Markdown(url=url)
+    web_2_images = Web2Images(url=url)
+    web_2_tables = Web2Tables(url=url)
 
-    web2md.batch_download()
-
-    web2md.batch_convert2markdown()
-    web2imgs.batch_extract2images()
-    web2tables.batch_extract2tables()
+    web_2_md.convert2markdown()
+    web_2_images.extract2images()
+    web_2_tables.extract2tables()
