@@ -109,7 +109,7 @@ class LLMMarkdown2Json:
                 },
             ]
             markdown_json = self.llm_openai_call(messages)
-            logger.info(markdown_json)
+            logger.debug(markdown_json)
             return json.loads(markdown_json).get("cleaned_markdown", None)
         except Exception as e:
             logger.exception(e)

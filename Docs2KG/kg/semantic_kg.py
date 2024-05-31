@@ -65,6 +65,7 @@ class SemanticKG:
         self,
         folder_path: Path,
         llm_enabled: bool = False,
+        scanned_pdf: bool = False,
     ):
         """
         Initialize the SemanticKG class
@@ -87,6 +88,7 @@ class SemanticKG:
             raise FileNotFoundError(f"{self.layout_kg_file} does not exist")
         # load layout_kg
         self.layout_kg = self.load_kg(self.layout_kg_file)
+        self.scanned_pdf = scanned_pdf
 
     def add_semantic_kg(self):
         """
@@ -96,8 +98,9 @@ class SemanticKG:
 
         """
         # we will start with the image to content
-        self.semantic_link_image_to_content()
-        self.semantic_link_table_to_content()
+        if not self.scanned_pdf:
+            self.semantic_link_image_to_content()
+            self.semantic_link_table_to_content()
         self.semantic_text2kg()
         self.semantic_page_summary()
 
