@@ -297,8 +297,24 @@ class JSON2Triplets:
                 # check if the subject is in the entities_mapping
                 if subject not in self.entities_mapping:
                     self.entities_mapping[subject] = str(uuid4())
+                    # add the subject rel to the parent
+                    self.triplets_json["relationships"].append(
+                        {
+                            "start_node": node["uuid"],
+                            "end_node": self.entities_mapping[subject],
+                            "type": "HAS_ENTITY",
+                        }
+                    )
                 if object_ent not in self.entities_mapping:
                     self.entities_mapping[object_ent] = str(uuid4())
+                    # add the object rel to the parent
+                    self.triplets_json["relationships"].append(
+                        {
+                            "start_node": node["uuid"],
+                            "end_node": self.entities_mapping[object_ent],
+                            "type": "HAS_ENTITY",
+                        }
+                    )
                 subject_uuid = self.entities_mapping[subject]
                 object_uuid = self.entities_mapping[object_ent]
                 # add the subject

@@ -30,6 +30,7 @@ def openai_call(
             model=llm_model_name,
             response_format={"type": "json_object"},
             messages=messages,
+            temperature=0.0,
         )
         logger.debug(response)
         content = response.choices[0].message.content
