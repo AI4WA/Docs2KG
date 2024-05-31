@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 from typing import List
 
@@ -34,6 +35,41 @@ class LLMMarkdown2Json:
         self.json_csv_file = markdown_file.with_suffix(".json.csv")
         self.llm_model_name = llm_model_name
         self.cost = 0
+
+    def clean_markdown(self, markdown: str) -> str:
+        """
+        Prompt will give the LLM Markdown text
+
+        Ask it clean it, and then get the Markdown into proper format
+
+        Args:
+            markdown (str): The Markdown text
+
+        Returns:
+            str: The cleaned Markdown text
+        """
+        messages = [
+            {
+                "role": "system",
+                "content": """You are a helpful assistant to clean the markdown text.""",
+            },
+            {
+                "role": "user",
+                "content": f"""
+                            Clean the markdown.
+                            - Remove noise characters: not meaningful characters or information, for example
+                                something like "I"
+                            - Make sure the markdown is fit with the markdown format
+                            - Only do remove for the noise characters, do not change any content
+                            Clean the following markdown text:\n\n{markdown}
+                            Output it in json format
+                            with a key "cleaned_markdown"
+                            """,
+            },
+        ]
+        res_json_str = self.openai_call(messages)
+        res_json = json.loads(res_json_str)
+        return res_json.get("cleaned_markdown", None)
 
     def extract2json(self):
         if self.json_csv_file.exists():

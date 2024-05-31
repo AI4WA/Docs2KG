@@ -1,7 +1,7 @@
 import json
 import re
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 from tqdm import tqdm
 
@@ -146,9 +146,13 @@ class SemanticKG:
                             Because the content have not been
                             """
 
-                            uuids = self.util_caption_mentions_detect(caption=text)
+                            uuids, caption = self.util_caption_mentions_detect(
+                                caption=text
+                            )
                             logger.info(f"UUIDs: {uuids}")
                             child["node_properties"]["mentioned_in"] = uuids
+                            if caption:
+                                child["node_properties"]["unique_description"] = caption
                             continue
 
         self.export_kg()
@@ -178,9 +182,13 @@ class SemanticKG:
                             logger.info(f"Table/Caption detected: {text}")
                             # we will use this
                             child["node_properties"]["caption"] = text
-                            uuids = self.util_caption_mentions_detect(caption=text)
+                            uuids, caption = self.util_caption_mentions_detect(
+                                caption=text
+                            )
                             logger.info(f"UUIDs: {uuids}")
                             child["node_properties"]["mentioned_in"] = uuids
+                            if caption:
+                                child["node_properties"]["unique_description"] = caption
                             continue
         self.export_kg()
 
@@ -310,7 +318,7 @@ class SemanticKG:
         #     return self.llm_detect_caption(text)
         return False
 
-    def util_caption_mentions_detect(self, caption: str) -> List[str]:
+    def util_caption_mentions_detect(self, caption: str) -> Tuple[List[str], str]:
         """
 
         First we need to find the unique description for the caption.
@@ -352,7 +360,7 @@ class SemanticKG:
         mentioned_uuids = self.util_mentioned_uuids(
             self.layout_kg, unique_description, mentioned_uuids
         )
-        return mentioned_uuids
+        return mentioned_uuids, unique_description
 
     def util_mentioned_uuids(
         self, node: dict, unique_description: str, uuids: List[str]
