@@ -1,8 +1,9 @@
 import json
 from pathlib import Path
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 from uuid import uuid4
 
+import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
@@ -10,6 +11,13 @@ from Docs2KG.utils.constants import DATA_INPUT_DIR, DATA_OUTPUT_DIR
 from Docs2KG.utils.get_logger import get_logger
 
 logger = get_logger(__name__)
+
+
+"""
+TODO:
+
+- Try to extract the image and file captions
+"""
 
 
 class WebLayoutKG:
@@ -25,6 +33,9 @@ class WebLayoutKG:
             input_dir (Path): Path to the input directory where the html files will be downloaded
         """
         self.url = url
+        # extract the domain from the url, if it is http://example.com/sss, then the domain is https://example.com
+        self.domain = f"{urlparse(url).scheme}://{urlparse(url).netloc}"
+
         self.output_dir = output_dir
         self.input_dir = input_dir
         self.quoted_url = quote(url, "")
@@ -37,6 +48,12 @@ class WebLayoutKG:
         self.kg_json = {}
         self.kg_folder = self.output_dir / "kg"
         self.kg_folder.mkdir(parents=True, exist_ok=True)
+
+        # image and table output directories
+        self.image_output_dir = self.output_dir / "images"
+        self.image_output_dir.mkdir(parents=True, exist_ok=True)
+        self.table_output_dir = self.output_dir / "tables"
+        self.table_output_dir.mkdir(parents=True, exist_ok=True)
 
     def download_html_file(self):
         """
@@ -111,6 +128,38 @@ class WebLayoutKG:
         for child in soup.children:
             if child.name is not None:
                 child_node = self.extract_kg(child)
+                # if it is a image tag, then extract the image and save it to the output directory
+                if child.name == "img":
+                    img_url = child.get("src")
+                    if not img_url.startswith("http"):
+                        img_url = self.domain + img_url
+                    img_data = requests.get(img_url).content
+                    img_name = img_url.split("/")[-1]
+                    logger.info("image_url")
+                    logger.info(img_url)
+                    if "?" in img_name:
+                        img_name = img_name.split("?")[0]
+                    with open(f"{self.output_dir}/images/{img_name}", "wb") as f:
+                        f.write(img_data)
+                    logger.info(f"Extracted the HTML file from {self.url} to images")
+                    child_node["node_properties"][
+                        "img_path"
+                    ] = f"{self.output_dir}/images/{img_name}"
+                # if it is a table tag, then extract the table and save it to the output directory
+                if child.name == "table":
+                    rows = []
+                    for row in child.find_all("tr"):
+                        cells = [
+                            cell.get_text(strip=True)
+                            for cell in row.find_all(["th", "td"])
+                        ]
+                        rows.append(cells)
+                    df = pd.DataFrame(
+                        rows[1:], columns=rows[0]
+                    )  # Assuming first row is header
+                    csv_filename = f"{self.output_dir}/tables/{child_node['uuid']}.csv"
+                    df.to_csv(csv_filename, index=False)
+                    logger.info(f"Extracted the HTML file from {self.url} to tables")
                 node["children"].append(child_node)
         return node
 
