@@ -1,3 +1,7 @@
+from Docs2KG.kg.layout_kg import LayoutKG
+from Docs2KG.kg.semantic_kg import SemanticKG
+from Docs2KG.kg.utils.json2triplets import JSON2Triplets
+from Docs2KG.kg.utils.neo4j_connector import Neo4jLoader
 from Docs2KG.modules.llm.markdown2json import LLMMarkdown2Json
 from Docs2KG.parser.pdf.pdf2blocks import PDF2Blocks
 from Docs2KG.parser.pdf.pdf2metadata import PDF_TYPE_SCANNED, get_scanned_or_exported
@@ -5,10 +9,6 @@ from Docs2KG.parser.pdf.pdf2tables import PDF2Tables
 from Docs2KG.parser.pdf.pdf2text import PDF2Text
 from Docs2KG.utils.constants import DATA_INPUT_DIR, DATA_OUTPUT_DIR
 from Docs2KG.utils.get_logger import get_logger
-from Docs2KG.kg.layout_kg import LayoutKG
-from Docs2KG.kg.semantic_kg import SemanticKG
-from Docs2KG.kg.utils.json2triplets import JSON2Triplets
-from Docs2KG.kg.utils.neo4j_connector import Neo4jLoader
 
 logger = get_logger(__name__)
 
@@ -110,7 +110,7 @@ if __name__ == "__main__":
         layout_kg.transform()
 
         # After this, you will have the triplets_kg.json in the `kg` folder
-        # You can take it from here, load it into your graph db, or handle it in anyway you want
+        # You can take it from here, load it into your graph db, or handle it in any way you want
 
         # If you want to load it into Neo4j, you can refer to the `examples/kg/utils/neo4j_connector.py`
         # to get it quickly loaded into Neo4j
@@ -119,7 +119,7 @@ if __name__ == "__main__":
         uri = "bolt://localhost:7687"  # if it is a remote graph db, you can change it to the remote uri
         username = "neo4j"
         password = "testpassword"
-        json_file_path = DATA_OUTPUT_DIR / "kg" / "triplets_kg.json"
+        json_file_path = output_folder / "kg" / "triplets_kg.json"
 
         neo4j_loader = Neo4jLoader(uri, username, password, json_file_path, clean=True)
         neo4j_loader.load_data()

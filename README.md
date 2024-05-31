@@ -2,8 +2,12 @@
 
 **An Open Source Framework for Transforming Unstructured Data into Unified Knowledge Graph**
 
+![Status](https://img.shields.io/badge/Status-Work%20in%20Progress-yellow)
+
 ![Lint](https://github.com/AI4WA/Docs2KG/actions/workflows/lint.yml/badge.svg)
 ![Documentation](https://github.com/AI4WA/Docs2KG/actions/workflows/docs.yml/badge.svg)
+
+[![Demo](https://img.shields.io/badge/Demo-Available-blue)](https://docs2kg.ai4wa.com/Video/)
 
 Three pillars of the LLM applications in our opinion:
 
