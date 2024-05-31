@@ -14,22 +14,6 @@ for path in sorted(src.rglob("*.py")):
     parts = tuple(module_path.parts)
 
     if parts[-1] == "__init__":
-        # parts = parts[:-1]
-        # get this to be the index html under this folder
-        # replace the __init__ with index
-        # identifier = ".".join(parts[:-1])
-        # parts = parts[:-1] + ("main",)
-        # full_doc_path = "sources" / module_path.parent / "index.md"
-        # if identifier == "":
-        #     print(
-        #         "::: Docs2KG",
-        #         file=mkdocs_gen_files.open(full_doc_path, "w"),
-        #     )
-        # else:
-        #     print(
-        #         f"::: Docs2KG.{identifier}",
-        #         file=mkdocs_gen_files.open(full_doc_path, "w"),
-        #     )
         continue
     elif parts[-1] == "__main__":
         continue
