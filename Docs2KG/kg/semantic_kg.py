@@ -81,14 +81,12 @@ class SemanticKG:
         if not self.kg_folder.exists():
             self.kg_folder.mkdir(parents=True, exist_ok=True)
 
-        self.semantic_kg_file = self.kg_folder / "semantic_kg.json"
         self.layout_kg_file = self.kg_folder / "layout_kg.json"
         # if layout_kg does not exist, then raise an error
         if not self.layout_kg_file.exists():
             raise FileNotFoundError(f"{self.layout_kg_file} does not exist")
         # load layout_kg
         self.layout_kg = self.load_kg(self.layout_kg_file)
-        self.semantic_kg = []
 
     def add_semantic_kg(self):
         """
@@ -151,23 +149,9 @@ class SemanticKG:
                             uuids = self.util_caption_mentions_detect(caption=text)
                             logger.info(f"UUIDs: {uuids}")
                             child["node_properties"]["mentioned_in"] = uuids
-                            # TODO: ?pop out its own uuid, which should be within
-                            for uuid in uuids:
-                                self.semantic_kg.append(
-                                    {
-                                        "source_uuid": item["uuid"],  # uuid of image
-                                        "source_semantic": None,
-                                        "predicate": "mentioned_in",
-                                        "predicate_desc": None,
-                                        "target_uuid": uuid,
-                                        "target_semantic": None,
-                                        "extraction_method": "rule_based",
-                                    }
-                                )
                             continue
 
-        self.export_kg("layout")
-        self.export_kg("semantic")
+        self.export_kg()
 
     def semantic_link_table_to_content(self):
         """
@@ -197,21 +181,8 @@ class SemanticKG:
                             uuids = self.util_caption_mentions_detect(caption=text)
                             logger.info(f"UUIDs: {uuids}")
                             child["node_properties"]["mentioned_in"] = uuids
-                            for uuid in uuids:
-                                self.semantic_kg.append(
-                                    {
-                                        "source_uuid": item["uuid"],  # uuid of table
-                                        "source_semantic": None,
-                                        "predicate": "mentioned_in",
-                                        "predicate_desc": None,
-                                        "target_uuid": uuid,
-                                        "target_semantic": None,
-                                        "extraction_method": "rule_based",
-                                    }
-                                )
                             continue
-        self.export_kg("layout")
-        self.export_kg("semantic")
+        self.export_kg()
 
     def semantic_text2kg(self):
         """
@@ -249,7 +220,7 @@ class SemanticKG:
                 text = node["node_properties"]["content"]
                 triplets = self.llm_extract_triplet(text)
                 node["node_properties"]["text2kg"] = triplets
-            self.export_kg("layout")
+            self.export_kg()
             logger.info(f"LLM cost: {self.cost - current_cost}")
         else:
             # Hard to do this without LLM
@@ -296,7 +267,7 @@ class SemanticKG:
                 summary = self.llm_page_summary(page_content)
                 page["node_properties"]["summary"] = summary
 
-        self.export_kg("layout")
+        self.export_kg()
 
     @staticmethod
     def load_kg(file_path: Path) -> dict:
@@ -313,16 +284,13 @@ class SemanticKG:
             kg = json.load(f)
         return kg
 
-    def export_kg(self, kg_type: str):
+    def export_kg(self):
         """
         Export the semantic knowledge graph to a JSON file
         """
-        if kg_type == "semantic":
-            with open(self.semantic_kg_file, "w") as f:
-                json.dump(self.semantic_kg, f, indent=4)
-        elif kg_type == "layout":
-            with open(self.layout_kg_file, "w") as f:
-                json.dump(self.layout_kg, f, indent=4)
+
+        with open(self.layout_kg_file, "w") as f:
+            json.dump(self.layout_kg, f, indent=4)
 
     def util_caption_detection(self, text: str) -> bool:  # noqa
         """
