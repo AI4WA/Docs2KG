@@ -2,6 +2,7 @@ from Docs2KG.parser.web.web2images import Web2Images
 from Docs2KG.parser.web.web2markdown import Web2Markdown
 from Docs2KG.parser.web.web2tables import Web2Tables
 from Docs2KG.parser.web.web2urls import Web2URLs
+from Docs2KG.kg.web_layout_kg import WebLayoutKG
 
 if __name__ == "__main__":
     """
@@ -19,3 +20,6 @@ if __name__ == "__main__":
     web_2_images.extract2images()
     web_2_tables.extract2tables()
     web_2_urls.extract2tables()
+
+    web_layout_kg = WebLayoutKG(url=url)
+    web_layout_kg.create_kg()
