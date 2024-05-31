@@ -70,6 +70,12 @@ class JSON2Triplets:
         """
         Transform the node to triplets
 
+        For the relationship part.
+
+        Also need to consider the relation within the for loop.
+
+        Before and After
+
         Args:
             node (dict): The node
             parent_uuid (str): The UUID of the node
@@ -90,8 +96,21 @@ class JSON2Triplets:
             "type": "HAS_CHILD",
         }
         self.triplets_json["relationships"].append(rel)
-        for child in node["children"]:
+        for index, child in enumerate(node["children"]):
             # if the children is text_block, then stop here
+            before_node_uuid = None
+            after_node_uuid = None
+            if index > 0:
+                before_node_uuid = node["children"][index - 1]["uuid"]
+
+            if before_node_uuid is not None:
+                before_rel = {
+                    "start_node": before_node_uuid,
+                    "end_node": child["uuid"],
+                    "type": "BEFORE",
+                }
+                self.triplets_json["relationships"].append(before_rel)
+
             if child["node_type"] == "text_block":
                 continue
             self.transform_node(child, parent_uuid=uuid)
