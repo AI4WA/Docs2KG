@@ -107,28 +107,28 @@ class WebLayoutKG:
 
         """
         # FIXME: still not working properly
+        node = {
+            "uuid": str(uuid4()),
+            "children": [],
+        }
+
+        for child in soup.children:
+            if child.name is not None and soup.name != "table":
+                child_node = self.extract_kg(child)
+                node["children"].append(child_node)
         # content should be text if exists, if not, leave ""
-        content = str(soup.contents[0]) if soup.contents else ""
+        content = str(soup.text) if soup.text is not None else ""
+        content = content.strip()
         logger.info(content)
         logger.info(soup.name)
-
         # if there is no parent, then it is the root node, which we call it document
         node_type = str(soup.name) if soup.name is not None else "text"
         if "document" in node_type:
             node_type = "document"
 
-        node = {
-            "uuid": str(uuid4()),
-            "node_type": node_type,
-            "node_properties": {
-                "content": content,
-                # unpack all other properties
-                **soup.attrs,
-            },
-            "children": [],
-        }
-
-        # if it is a image tag, then extract the image and save it to the output directory
+        node["node_type"] = node_type
+        node["node_properties"] = {"content": content, **soup.attrs}
+        # if it is an image tag, then extract the image and save it to the output directory
         if soup.name == "img":
             img_url = soup.get("src")
             if not img_url.startswith("http"):
@@ -155,11 +155,9 @@ class WebLayoutKG:
             csv_filename = f"{self.output_dir}/tables/{node['uuid']}.csv"
             df.to_csv(csv_filename, index=False)
             logger.info(f"Extracted the HTML file from {self.url} to tables")
-            return node
-        for child in soup.children:
-            if child.name is not None:
-                child_node = self.extract_kg(child)
-                node["children"].append(child_node)
+            node["node_properties"]["table_path"] = csv_filename
+        # remove the node from soup after extracting the image and table
+        soup.extract()
         return node
 
     def export_kg(self) -> None:

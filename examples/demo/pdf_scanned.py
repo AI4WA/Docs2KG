@@ -100,7 +100,9 @@ if __name__ == "__main__":
         # After this, you will have the layout.json in the `kg` folder
 
         # then we add the semantic knowledge graph
-        semantic_kg = SemanticKG(output_folder, llm_enabled=True, scanned_pdf=True)
+        semantic_kg = SemanticKG(
+            output_folder, llm_enabled=True, input_format="pdf_scanned"
+        )
         semantic_kg.add_semantic_kg()
 
         # After this, the layout_kg.json will be augmented with the semantic connections

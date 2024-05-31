@@ -65,7 +65,7 @@ class SemanticKG:
         self,
         folder_path: Path,
         llm_enabled: bool = False,
-        scanned_pdf: bool = False,
+        input_format: str = "pdf_exported",
     ):
         """
         Initialize the SemanticKG class
@@ -88,7 +88,7 @@ class SemanticKG:
             raise FileNotFoundError(f"{self.layout_kg_file} does not exist")
         # load layout_kg
         self.layout_kg = self.load_kg(self.layout_kg_file)
-        self.scanned_pdf = scanned_pdf
+        self.input_format = input_format
 
     def add_semantic_kg(self):
         """
@@ -98,7 +98,7 @@ class SemanticKG:
 
         """
         # we will start with the image to content
-        if not self.scanned_pdf:
+        if self.input_format == "pdf_exported":
             self.semantic_link_image_to_content()
             self.semantic_link_table_to_content()
         self.semantic_text2kg()
@@ -229,6 +229,9 @@ class SemanticKG:
             for node in tqdm(nodes, desc="Extracting triplets"):
                 # extract the triplets from the text
                 text = node["node_properties"]["content"]
+                logger.debug(text)
+                if text == "":
+                    continue
                 triplets = self.llm_extract_triplet(text)
                 node["node_properties"]["text2kg"] = triplets
             self.export_kg()
