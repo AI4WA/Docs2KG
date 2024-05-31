@@ -99,7 +99,6 @@ class JSON2Triplets:
         for index, child in enumerate(node["children"]):
             # if the children is text_block, then stop here
             before_node_uuid = None
-            after_node_uuid = None
             if index > 0:
                 before_node_uuid = node["children"][index - 1]["uuid"]
 
