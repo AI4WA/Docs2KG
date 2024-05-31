@@ -8,7 +8,7 @@ from Docs2KG.utils.get_logger import get_logger
 logger = get_logger(__name__)
 
 if __name__ == "__main__":
-    pdf_file = DATA_INPUT_DIR / "tests_pdf" / "4.pdf"
+    pdf_file = DATA_INPUT_DIR / "OMR241-Chartbook.pdf"
     scanned_or_exported = get_scanned_or_exported(pdf_file)
     if scanned_or_exported == PDF_TYPE_SCANNED:
         logger.info("This is a scanned pdf, can not process it now")

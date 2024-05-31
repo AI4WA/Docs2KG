@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 from pathlib import Path
 from uuid import uuid4
 
@@ -124,7 +125,7 @@ class JSON2Triplets:
         Returns:
 
         """
-        copied_properties = properties.copy()
+        copied_properties = deepcopy(properties)
         if "text2kg" in copied_properties:
             copied_properties.pop("text2kg")
         return copied_properties
@@ -277,7 +278,11 @@ class JSON2Triplets:
                 predicate = predicate.strip()
                 subject_ner_type = subject_ner_type.strip()
                 object_ner_type = object_ner_type.strip()
-
+                predicate = "".join([i for i in predicate if i.isalnum() or i == " "])
+                # should not start with number
+                if predicate and predicate[0].isdigit():
+                    continue
+                predicate = predicate.replace(" ", "_")
                 if any(
                     [
                         subject == "",
@@ -297,21 +302,40 @@ class JSON2Triplets:
                 subject_uuid = self.entities_mapping[subject]
                 object_uuid = self.entities_mapping[object_ent]
                 # add the subject
+                subject_ner_type = "".join(
+                    [i for i in subject_ner_type if i.isalnum() or i == " "]
+                )
+                subject_ner_type = subject_ner_type.replace(" ", "_")
                 self.triplets_json["nodes"].append(
                     {
                         "uuid": subject_uuid,
-                        "labels": ["ENTITY", subject_ner_type.upper(), "TEXT2KG"],
+                        "labels": [
+                            "ENTITY",
+                            subject_ner_type.upper(),
+                            "TEXT2KG",
+                        ],
                         "properties": {"text": subject},
                     }
                 )
                 # add the object
+                # replace object_ner_type, clean all special characters, only keep the letters and numbers
+                object_ner_type = "".join(
+                    [i for i in object_ner_type if i.isalnum() or i == " "]
+                )
+                object_ner_type = object_ner_type.replace(" ", "_")
                 self.triplets_json["nodes"].append(
                     {
                         "uuid": object_uuid,
-                        "labels": ["ENTITY", object_ner_type.upper(), "TEXT2KG"],
+                        "labels": [
+                            "ENTITY",
+                            object_ner_type.upper(),
+                            "TEXT2KG",
+                        ],
                         "properties": {"text": object_ent},
                     }
                 )
+                # do same to the predicate
+
                 # add the relationship
                 rel = {
                     "start_node": subject_uuid,
