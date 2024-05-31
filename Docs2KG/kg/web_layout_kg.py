@@ -1,9 +1,11 @@
+import json
 from pathlib import Path
 from urllib.parse import quote
-from bs4 import BeautifulSoup
 from uuid import uuid4
+
 import requests
-import json
+from bs4 import BeautifulSoup
+
 from Docs2KG.utils.constants import DATA_INPUT_DIR, DATA_OUTPUT_DIR
 from Docs2KG.utils.get_logger import get_logger
 
@@ -88,11 +90,22 @@ class WebLayoutKG:
 
         """
         # content should be text if exists, if not, leave ""
-        content = "".join(soup.stripped_strings) if soup.stripped_strings else ""
+        content = str(soup.contents[0]) if soup.contents else ""
+        logger.info(content)
+        logger.info(soup.name)
+
+        # if there is no parent, then it is the root node, which we call it document
+        node_type = str(soup.name) if soup.name is not None else "text"
+        if "document" in node_type:
+            node_type = "document"
         node = {
             "uuid": str(uuid4()),
-            "node_type": soup.name if soup.name is not None else "text",
-            "node_properties": {"content": content},
+            "node_type": node_type,
+            "node_properties": {
+                "content": content,
+                # unpack all other properties
+                **soup.attrs,
+            },
             "children": [],
         }
         for child in soup.children:
