@@ -77,10 +77,12 @@ class JSON2Triplets:
         Returns:
 
         """
-        labels = [node["node_type"]]
+        labels = [node["node_type"].upper()]
         uuid = node["uuid"]
         properties = node["node_properties"]
-        entity = {"uuid": uuid, "labels": labels, "properties": properties}
+        # deep copy the properties
+        copied_properties = self.clean_nested_properties(properties)
+        entity = {"uuid": uuid, "labels": labels, "properties": copied_properties}
         self.triplets_json["nodes"].append(entity)
         rel = {
             "start_node": parent_uuid,
@@ -89,7 +91,25 @@ class JSON2Triplets:
         }
         self.triplets_json["relationships"].append(rel)
         for child in node["children"]:
+            # if the children is text_block, then stop here
+            if child["node_type"] == "text_block":
+                continue
             self.transform_node(child, parent_uuid=uuid)
+
+    @staticmethod
+    def clean_nested_properties(properties: dict):
+        """
+        Clean the nested properties
+        Args:
+            properties:
+
+        Returns:
+
+        """
+        copied_properties = properties.copy()
+        if "text2kg" in copied_properties:
+            copied_properties.pop("text2kg")
+        return copied_properties
 
     def transform_images(self):
         """
@@ -115,11 +135,14 @@ class JSON2Triplets:
                     for child in node["children"]:
                         if child["node_type"] == "text_block":
                             text_block_uuid = child["uuid"]
+                            copied_properties = self.clean_nested_properties(
+                                child["node_properties"]
+                            )
                             self.triplets_json["nodes"].append(
                                 {
                                     "uuid": text_block_uuid,
-                                    "labels": ["text_block"],
-                                    "properties": child["node_properties"],
+                                    "labels": ["TEXT_BLOCK"],
+                                    "properties": copied_properties,
                                 }
                             )
 
@@ -166,11 +189,14 @@ class JSON2Triplets:
                     for child in node["children"]:
                         if child["node_type"] == "text_block":
                             text_block_uuid = child["uuid"]
+                            copied_properties = self.clean_nested_properties(
+                                child["node_properties"]
+                            )
                             self.triplets_json["nodes"].append(
                                 {
                                     "uuid": text_block_uuid,
-                                    "labels": ["text_block"],
-                                    "properties": child["node_properties"],
+                                    "labels": ["TEXT_BLOCK"],
+                                    "properties": copied_properties,
                                 }
                             )
 
@@ -208,7 +234,7 @@ class JSON2Triplets:
             if len(text2kg_list) == 0:
                 continue
             for text2kg in text2kg_list:
-                logger.info(f"Text2KG: {text2kg}")
+
                 subject = text2kg.get("subject", None)
                 subject_ner_type = text2kg.get("subject_ner_type", None)
                 predicate = text2kg.get("predicate", None)
@@ -227,6 +253,24 @@ class JSON2Triplets:
                     ]
                 ):
                     continue
+                # strip the text and then clean again
+                subject = subject.strip()
+                object_ent = object_ent.strip()
+                predicate = predicate.strip()
+                subject_ner_type = subject_ner_type.strip()
+                object_ner_type = object_ner_type.strip()
+
+                if any(
+                    [
+                        subject == "",
+                        object_ent == "",
+                        predicate == "",
+                        subject_ner_type == "",
+                        object_ner_type == "",
+                    ]
+                ):
+                    continue
+                logger.info(f"Text2KG: {text2kg}")
                 # check if the subject is in the entities_mapping
                 if subject not in self.entities_mapping:
                     self.entities_mapping[subject] = str(uuid4())
@@ -238,7 +282,7 @@ class JSON2Triplets:
                 self.triplets_json["nodes"].append(
                     {
                         "uuid": subject_uuid,
-                        "labels": ["entity", subject_ner_type, "TEXT2KG"],
+                        "labels": ["ENTITY", subject_ner_type.upper(), "TEXT2KG"],
                         "properties": {"text": subject},
                     }
                 )
@@ -246,7 +290,7 @@ class JSON2Triplets:
                 self.triplets_json["nodes"].append(
                     {
                         "uuid": object_uuid,
-                        "labels": ["entity", object_ner_type, "TEXT2KG"],
+                        "labels": ["ENTITY", object_ner_type.upper(), "TEXT2KG"],
                         "properties": {"text": object_ent},
                     }
                 )
