@@ -1,5 +1,3 @@
-from urllib.parse import unquote
-
 import pandas as pd
 from bs4 import BeautifulSoup
 
@@ -15,17 +13,13 @@ class Web2Tables(WebParserBase):
         self.table_output_dir = self.output_dir / "tables"
         self.table_output_dir.mkdir(parents=True, exist_ok=True)
 
-    def extract2tables(self, quoted_url):
+    def extract2tables(self):
         """
         Extract the HTML file to tables and save it to the output directory
 
-        Args:
-            quoted_url (str): The quoted URL of the HTML file
         """
-        html_tab_dir = self.table_output_dir / quoted_url
-        html_tab_dir.mkdir(parents=True, exist_ok=True)
 
-        with open(f"{self.input_dir}/{quoted_url}.html", "r") as f:
+        with open(f"{self.output_dir}/index.html", "r") as f:
             html_content = f.read()
 
         soup = BeautifulSoup(html_content, "html.parser")
@@ -37,15 +31,6 @@ class Web2Tables(WebParserBase):
                 ]
                 rows.append(cells)
             df = pd.DataFrame(rows[1:], columns=rows[0])  # Assuming first row is header
-            csv_filename = f"{html_tab_dir}/{i}.csv"
+            csv_filename = f"{self.output_dir}/tables/{i}.csv"
             df.to_csv(csv_filename, index=False)
-            logger.info(f"Extracted the HTML file from {unquote(quoted_url)} to tables")
-
-    def batch_extract2tables(self):
-        """
-        Batch extract html files to tables
-        """
-        for quoted_url in self.quoted_urls:
-            self.extract2tables(quoted_url)
-            logger.info(f"Extracted the HTML file from {unquote(quoted_url)} to tables")
-        logger.info("All HTML files have been extracted to tables!")
+            logger.info(f"Extracted the HTML file from {self.url} to tables")
