@@ -94,17 +94,22 @@ class LLMMarkdown2Json:
                 {
                     "role": "user",
                     "content": f"""
-                                Clean the markdown.
+                                You task is to clean the markdown.
+                                
+                                Steps include
+                                
                                 - Remove the content which is not meaningful, such as a single I character, etc
                                 - Do not need to keep special characters, such as `#`, `*`, etc, only keep
                                     meaningful content
                                 - Make sure the markdown is fit with the markdown format
                                 - Only do remove for the noise characters, do not change any content
-                                Clean the following markdown text:\n\n{markdown}
+
                                 Output should be a cleaned markdown text, which in str format
 
                                 It will stay in the response in json format
                                 with a key "cleaned_markdown"
+                                
+                                Clean the following markdown text:\n\n{markdown}
                                 """,
                 },
             ]
