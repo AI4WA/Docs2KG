@@ -73,19 +73,6 @@ class LayoutKG:
         if not self.kg_folder.exists():
             self.kg_folder.mkdir(parents=True, exist_ok=True)
         self.kg_json = {}
-        self.kg_df = pd.DataFrame(
-            columns=[
-                "source_node_type",
-                "source_node_uuid",
-                "source_node_properties",
-                "edge_type",
-                "edge_uuid",
-                "edge_properties",
-                "destination_node_type",
-                "destination_node_uuid",
-                "destination_node_properties",
-            ]
-        )
         self.metadata = json.load((self.folder_path / "metadata.json").open())
         self.sentence_transformer = SentenceTransformer("all-MiniLM-L6-v2")
         self.scanned_pdf = scanned_pdf
