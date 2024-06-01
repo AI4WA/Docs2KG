@@ -61,10 +61,13 @@ class JSON2Triplets:
         """
         Transform the JSON to triplets
         """
+
         self.transform_node(self.kg_json)
+
         self.transform_images()
         self.transform_tables()
         self.transform_text2kg(self.kg_json)
+
         self.export_json()
 
     def transform_node(self, node: dict, parent_uuid: str = None):
