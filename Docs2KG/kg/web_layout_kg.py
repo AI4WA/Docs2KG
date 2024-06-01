@@ -1,4 +1,5 @@
 import json
+from copy import deepcopy
 from pathlib import Path
 from urllib.parse import quote, urlparse
 from uuid import uuid4
@@ -127,7 +128,15 @@ class WebLayoutKG:
             node_type = "document"
 
         node["node_type"] = node_type
-        node["node_properties"] = {"content": content, **soup.attrs}
+        soup_attr = soup.attrs
+        copied_soup = deepcopy(soup_attr)
+        for key in copied_soup.keys():
+            if "-" in key:
+                soup_attr[key.replace("-", "_")] = copied_soup[key]
+                del soup_attr[key]
+            if "$" in key or ":" in key:
+                del soup_attr[key]
+        node["node_properties"] = {"content": content, **soup_attr}
         # if it is an image tag, then extract the image and save it to the output directory
         if soup.name == "img":
             img_url = soup.get("src")
