@@ -1,6 +1,8 @@
 import email
 import json
 
+import pandas as pd
+
 from Docs2KG.parser.email.base import EmailParseBase
 from Docs2KG.utils.get_logger import get_logger
 
@@ -37,6 +39,8 @@ class EmailDecompose(EmailParseBase):
         Returns:
 
         """
+        images = []
+        attachments = []
         # extract all the attachments
         for part in msg.walk():
             if part.get_content_disposition() == "attachment":
@@ -47,6 +51,13 @@ class EmailDecompose(EmailParseBase):
                     filepath = self.attachments_output_dir / filename
                     with open(filepath, "wb") as f:
                         f.write(part.get_payload(decode=True))
+                    attachments.append(
+                        {
+                            "name": filename,
+                            "path": filepath,
+                            "original_filename": part.get_filename(),
+                        }
+                    )
             # if content type is image/ , download the image
             if part.get_content_type().startswith("image/"):
                 img_data = part.get_payload(decode=True)
@@ -57,6 +68,13 @@ class EmailDecompose(EmailParseBase):
                     with open(img_path, "wb") as f:
                         f.write(img_data)
                     logger.info(f"Saved image to: {img_path}")
+                    images.append(
+                        {
+                            "name": img_name,
+                            "path": img_path,
+                            "cid": part.get("Content-ID", ""),
+                        }
+                    )
             # save content to html or text, end with .html or .txt
             if part.get_content_type() == "text/html":
                 html_content = part.get_payload(decode=True)
@@ -71,6 +89,8 @@ class EmailDecompose(EmailParseBase):
                     f.write(text_content)
                 logger.info(f"Saved text to: {text_output}")
 
+            # save df to csv, end with .csv
+
         # metadata to json, include subject, from, to, date
         email_metadata = {
             "subject": msg["subject"],
@@ -81,6 +101,14 @@ class EmailDecompose(EmailParseBase):
         metadata_output = self.output_dir / "metadata.json"
         with open(metadata_output, "w") as f:
             json.dump(email_metadata, f)
+
+        images_df = pd.DataFrame(images)
+        images_output = self.image_output_dir / "images.csv"
+        images_df.to_csv(images_output, index=False)
+
+        attachments_df = pd.DataFrame(attachments)
+        attachments_output = self.attachments_output_dir / "attachments.csv"
+        attachments_df.to_csv(attachments_output, index=False)
 
         return msg
 

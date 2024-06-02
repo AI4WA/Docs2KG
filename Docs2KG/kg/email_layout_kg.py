@@ -7,7 +7,6 @@ import pandas as pd
 import requests
 from bs4 import BeautifulSoup
 
-from Docs2KG.utils.constants import DATA_INPUT_DIR, DATA_OUTPUT_DIR
 from Docs2KG.utils.get_logger import get_logger
 
 logger = get_logger(__name__)
@@ -21,27 +20,16 @@ TODO:
 
 
 class EmailLayoutKG:
-    def __init__(
-        self, email_file: Path, output_dir: Path = None, input_dir: Path = None
-    ) -> None:
+    def __init__(self, output_dir: Path = None) -> None:
         """
         Initialize the WebParserBase class
 
         Args:
-            email_file (Path): Path to the email file, end with .eml
             output_dir (Path): Path to the output directory where the converted files will be saved
-            input_dir (Path): Path to the input directory where the html files will be downloaded
+
         """
-        self.email_file = email_file
 
         self.output_dir = output_dir
-        self.input_dir = input_dir
-
-        if self.output_dir is None:
-            self.output_dir = DATA_OUTPUT_DIR / self.quoted_url
-            self.output_dir.mkdir(parents=True, exist_ok=True)
-
-        self.download_html_file()
 
         self.kg_json = {}
         self.kg_folder = self.output_dir / "kg"
@@ -50,15 +38,21 @@ class EmailLayoutKG:
         # image and table output directories
         self.image_output_dir = self.output_dir / "images"
         self.image_output_dir.mkdir(parents=True, exist_ok=True)
-        self.table_output_dir = self.output_dir / "tables"
-        self.table_output_dir.mkdir(parents=True, exist_ok=True)
+        # attachment output directories
+        self.attachment_output_dir = self.output_dir / "attachments"
+        self.attachment_output_dir.mkdir(parents=True, exist_ok=True)
+
+        self.images_df = pd.read_csv(f"{self.image_output_dir}/images.csv")
+        self.attachments_df = pd.read_csv(
+            f"{self.attachment_output_dir}/attachments.csv"
+        )
 
     def create_kg(self):
         """
         Create the knowledge graph from the HTML file
 
         """
-        with open(f"{DATA_INPUT_DIR}/index.html", "r") as f:
+        with open(f"{self.output_dir}/email.html", "r") as f:
             html_content = f.read()
         soup = BeautifulSoup(html_content, "html.parser")
         """
@@ -91,7 +85,6 @@ class EmailLayoutKG:
             dict: Knowledge graph in JSON format
 
         """
-        # FIXME: still not working properly
         node = {
             "uuid": str(uuid4()),
             "children": [],
@@ -109,8 +102,7 @@ class EmailLayoutKG:
         # if there is no parent, then it is the root node, which we call it document
         node_type = str(soup.name) if soup.name is not None else "text"
         if "document" in node_type:
-            node_type = "document"
-
+            node_type = "email"
         node["node_type"] = node_type
         soup_attr = soup.attrs
         copied_soup = deepcopy(soup_attr)
@@ -124,18 +116,28 @@ class EmailLayoutKG:
         # if it is an image tag, then extract the image and save it to the output directory
         if soup.name == "img":
             img_url = soup.get("src")
-            if not img_url.startswith("http"):
-                img_url = self.domain + img_url
-            img_data = requests.get(img_url).content
-            img_name = img_url.split("/")[-1]
-            logger.info("image_url")
-            logger.info(img_url)
-            if "?" in img_name:
-                img_name = img_name.split("?")[0]
-            with open(f"{self.output_dir}/images/{img_name}", "wb") as f:
-                f.write(img_data)
-            logger.info(f"Extracted the HTML file from {self.url} to images")
-            node["node_properties"]["img_path"] = f"{self.output_dir}/images/{img_name}"
+
+            if img_url.startswith("cid:"):
+                image_cid = img_url.split(":")[1]
+                logger.info(image_cid)
+                image_file_path = self.images_df[
+                    self.images_df["cid"] == f"<{image_cid}>"
+                ]["path"].values[0]
+                logger.info(image_file_path)
+                node["node_properties"]["img_path"] = image_file_path
+            else:
+                img_data = requests.get(img_url).content
+                img_name = img_url.split("/")[-1]
+                logger.info("image_url")
+                logger.info(img_url)
+                if "?" in img_name:
+                    img_name = img_name.split("?")[0]
+                with open(f"{self.output_dir}/images/{img_name}", "wb") as f:
+                    f.write(img_data)
+                logger.info(f"Extracted the HTML file from {img_url} to images")
+                node["node_properties"][
+                    "img_path"
+                ] = f"{self.output_dir}/images/{img_name}"
         # if it is a table tag, then extract the table and save it to the output directory
         if soup.name == "table":
             rows = []
@@ -147,10 +149,26 @@ class EmailLayoutKG:
             df = pd.DataFrame(rows[1:], columns=rows[0])  # Assuming first row is header
             csv_filename = f"{self.output_dir}/tables/{node['uuid']}.csv"
             df.to_csv(csv_filename, index=False)
-            logger.info(f"Extracted the HTML file from {self.url} to tables")
+            logger.info("Extracted the HTML file from to tables")
             node["node_properties"]["table_path"] = csv_filename
         # remove the node from soup after extracting the image and table
         soup.extract()
+
+        if node_type == "email":
+            # also add the metadata to the node properties
+            with open(f"{self.output_dir}/metadata.json", "r") as f:
+                metadata = json.load(f)
+            node["node_properties"] = {**node["node_properties"], **metadata}
+
+            # add all the attachments to children
+            for _, attachment in self.attachments_df.iterrows():
+                attachment_node = {
+                    "uuid": str(uuid4()),
+                    "node_type": "attachment",
+                    "node_properties": attachment.to_dict(),
+                    "children": [],
+                }
+                node["children"].append(attachment_node)
         return node
 
     def export_kg(self) -> None:
