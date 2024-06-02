@@ -1,6 +1,5 @@
 import email
 import imaplib
-import json
 
 from Docs2KG.utils.constants import DATA_INPUT_DIR
 from Docs2KG.utils.get_logger import get_logger
@@ -134,63 +133,16 @@ class EmailConnector:
         # fetch the email for the content and all the attachments
         result, data = self.imap.fetch(email_id, "(RFC822)")
         raw_email = data[0][1]
-        msg = email.message_from_bytes(raw_email)
+
         # save the email to folder with email_id as filename
         email_output_dir = self.output_dir / email_id.decode("utf-8")
         email_output_dir.mkdir(parents=True, exist_ok=True)
-        email_filepath = email_output_dir / "email.eml"
+        email_filepath = (
+            email_output_dir / f"{self.email_address}.{email_id.decode('utf-8')}.eml"
+        )
         with open(email_filepath, "wb") as f:
             f.write(raw_email)
-
-        # extract all the attachments
-        for part in msg.walk():
-            if part.get_content_disposition() == "attachment":
-                filename = part.get_filename()
-                if filename:
-                    if filename.endswith("?="):
-                        filename = filename.rsplit("?=", 1)[0]
-
-                    filepath = email_output_dir / filename
-                    with open(filepath, "wb") as f:
-                        f.write(part.get_payload(decode=True))
-            # if content type is image/ , download the image
-            if part.get_content_type().startswith("image/"):
-                img_data = part.get_payload(decode=True)
-                img_name = part.get_filename()
-                if img_name:
-                    if img_name.endswith("?="):
-                        img_name = img_name.rsplit("?=", 1)[0]
-                    img_path = email_output_dir / img_name
-
-                    with open(img_path, "wb") as f:
-                        f.write(img_data)
-                    logger.info(f"Saved image to: {img_path}")
-            # save content to html or text, end with .html or .txt
-            if part.get_content_type() == "text/html":
-                html_content = part.get_payload(decode=True)
-                html_output = email_output_dir / "email.html"
-                with open(html_output, "wb") as f:
-                    f.write(html_content)
-                logger.info(f"Saved html to: {html_output}")
-            if part.get_content_type() == "text/plain":
-                text_content = part.get_payload(decode=True)
-                text_output = email_output_dir / "email.txt"
-                with open(text_output, "wb") as f:
-                    f.write(text_content)
-                logger.info(f"Saved text to: {text_output}")
-
-        # metadata to json, include subject, from, to, date
-        email_metadata = {
-            "subject": msg["subject"],
-            "from": msg["from"],
-            "to": msg["to"],
-            "date": msg["date"],
-        }
-        metadata_output = email_output_dir / "metadata.json"
-        with open(metadata_output, "w") as f:
-            json.dump(email_metadata, f)
-
-        return msg
+        logger.info(f"Saved email to: {email_filepath}")
 
     def logout(self):
         """
