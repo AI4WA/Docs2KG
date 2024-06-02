@@ -37,7 +37,7 @@ HTML_TAGS = [
 ]
 
 
-class LayoutKG:
+class PDFLayoutKG:
     """
     Layout Knowledge Graph
 
@@ -58,7 +58,7 @@ class LayoutKG:
     def __init__(
         self,
         folder_path: Path,
-        scanned_pdf: bool = False,
+        input_format: str = "pdf_exported",
     ):
         """
         Initialize the class with the pdf file
@@ -75,19 +75,19 @@ class LayoutKG:
         self.kg_json = {}
         self.metadata = json.load((self.folder_path / "metadata.json").open())
         self.sentence_transformer = SentenceTransformer("all-MiniLM-L6-v2")
-        self.scanned_pdf = scanned_pdf
+        self.input_format = input_format
 
     def create_kg(self):
         """
         Create the layout knowledge graph
         """
         self.document_kg()
-        if not self.scanned_pdf:
+        if self.input_format == "pdf_exported":
             self.link_image_to_page()
             self.link_table_to_page()
             self.link_image_to_context()
             self.link_table_to_context()
-        else:
+        if self.input_format == "pdf_scanned":
             # add page image
             self.link_page_image_to_page()
 

@@ -1,4 +1,4 @@
-from Docs2KG.kg.layout_kg import LayoutKG
+from Docs2KG.kg.pdf_layout_kg import PDFLayoutKG
 from Docs2KG.kg.semantic_kg import SemanticKG
 from Docs2KG.kg.utils.json2triplets import JSON2Triplets
 from Docs2KG.kg.utils.neo4j_connector import Neo4jLoader
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     """
 
     # you can name your file here
-    pdf_file = DATA_INPUT_DIR / "tests_pdf" / "4.pdf"
+    pdf_file = DATA_INPUT_DIR / "Excellent_Example_Report.pdf"
 
     output_folder = DATA_OUTPUT_DIR / "4.pdf"
     # the output will be default to `DATA_OUTPUT_DIR / "4.pdf" /` folder
@@ -94,7 +94,7 @@ if __name__ == "__main__":
 
         # next we will start to extract the layout knowledge graph first
 
-        layout_kg = LayoutKG(output_folder)
+        layout_kg = PDFLayoutKG(output_folder)
         layout_kg.create_kg()
         # After this, you will have the layout.json in the `kg` folder
 
@@ -106,8 +106,8 @@ if __name__ == "__main__":
         # in the `kg` folder
 
         # then we do the triplets extraction
-        layout_kg = JSON2Triplets(output_folder)
-        layout_kg.transform()
+        json_2_triplets = JSON2Triplets(output_folder)
+        json_2_triplets.transform()
 
         # After this, you will have the triplets_kg.json in the `kg` folder
         # You can take it from here, load it into your graph db, or handle it in any way you want

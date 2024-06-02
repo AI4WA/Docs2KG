@@ -101,8 +101,9 @@ class SemanticKG:
         if self.input_format == "pdf_exported":
             self.semantic_link_image_to_content()
             self.semantic_link_table_to_content()
+        if self.input_format != "excel":
+            self.semantic_page_summary()
         self.semantic_text2kg()
-        self.semantic_page_summary()
 
     def semantic_link_image_to_content(self):
         """
@@ -277,7 +278,7 @@ class SemanticKG:
         for page_index, page in enumerate(self.layout_kg["children"]):
             if page["node_type"] == "page":
                 page_content = page["node_properties"]["page_text"]
-                logger.info(page_content)
+                logger.debug(page_content)
                 summary = self.llm_page_summary(page_content)
                 page["node_properties"]["summary"] = summary
 

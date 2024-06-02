@@ -35,7 +35,6 @@ class JSON2Triplets:
         ],
         "relationships": [
             {
-
                 "start_node": uuid1,
                 "end_node": uuid2,
                 "type": "type1",
@@ -46,7 +45,6 @@ class JSON2Triplets:
             }
         ]
     }
-
 
     """
 
