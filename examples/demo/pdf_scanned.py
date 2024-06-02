@@ -1,4 +1,4 @@
-from Docs2KG.kg.layout_kg import LayoutKG
+from Docs2KG.kg.pdf_layout_kg import PDFLayoutKG
 from Docs2KG.kg.semantic_kg import SemanticKG
 from Docs2KG.kg.utils.json2triplets import JSON2Triplets
 from Docs2KG.kg.utils.neo4j_connector import Neo4jLoader
@@ -94,7 +94,7 @@ if __name__ == "__main__":
 
         # next we will start to extract the layout knowledge graph first
 
-        layout_kg = LayoutKG(output_folder, scanned_pdf=True)
+        layout_kg = PDFLayoutKG(output_folder, scanned_pdf=True)
         layout_kg.create_kg()
 
         # After this, you will have the layout.json in the `kg` folder

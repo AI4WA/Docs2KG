@@ -12,7 +12,7 @@ class Excel2Table(ExcelParseBase):
         Initialize the Excel2Table class.
         """
         super().__init__(*args, **kwargs)
-        self.table_output_dir = self.output_dir / "tables" / self.excel_filename
+        self.table_output_dir = self.output_dir / "tables"
         self.table_output_dir.mkdir(parents=True, exist_ok=True)
 
     @staticmethod
@@ -41,11 +41,26 @@ class Excel2Table(ExcelParseBase):
         return 0
 
     def extract_tables_from_excel(self):
-        # A simple example to extract tables from excel
-        df = pd.read_excel(self.excel_filepath, sheet_name=None)
+        # A simple example to extract tables from Excel
+        tables = []
+
+        df = pd.read_excel(self.excel_file, sheet_name=None)
+        index = 0
         for sheet_name, sheet_data in df.items():
             start_row = self.find_table_start(sheet_data)
             sheet_data = sheet_data.iloc[start_row:].reset_index(drop=True)
             sheet_data.to_csv(self.table_output_dir / f"{sheet_name}.csv", index=False)
-        logger.info(f"Tables extracted from {self.excel_filename}")
+            tables.append(
+                {
+                    "page_index": index,
+                    "table_index": 1,
+                    "filename": f"{sheet_name}.csv",
+                    "file_path": f"{self.table_output_dir}/{sheet_name}.csv",
+                    "sheet_name": sheet_name,
+                }
+            )
+            index += 1
+        logger.info(f"Tables extracted from {self.excel_file}")
+        table_df = pd.DataFrame(tables)
+        table_df.to_csv(self.table_output_dir / "tables.csv", index=False)
         return self.table_output_dir
