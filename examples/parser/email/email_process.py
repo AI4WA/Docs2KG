@@ -1,13 +1,7 @@
-from Docs2KG.parser.email.email2images import Email2Images
-from Docs2KG.parser.email.email2markdown import Email2Markdown
-
-# from Docs2KG.parser.email.email2table import Email2Table
+from Docs2KG.parser.email.email_compose import EmailDecompose
+from Docs2KG.utils.constants import DATA_INPUT_DIR
 
 if __name__ == "__main__":
-    email_filename = "UWA Sport eNews _ April 2024.eml"
-    email2md = Email2Markdown(email_filename=email_filename)
-    email2md.convert2markdown()
-    email2images = Email2Images(email_filename=email_filename)
-    email2images.extract2images()
-    # email2table = Email2Table(email_filename=email_filename)
-    # email2table.extract2table()
+    email_filename = DATA_INPUT_DIR / "email.eml"
+    email2md = EmailDecompose(email_file=email_filename)
+    email2md.decompose_email()
