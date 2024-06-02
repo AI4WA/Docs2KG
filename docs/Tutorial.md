@@ -34,13 +34,13 @@ url = "https://www.propertycouncil.com.au/news-research/research/office-market-r
 web_layout_kg = WebLayoutKG(url=url)
 web_layout_kg.create_kg()
 
-# Extract data from the Excel file (assuming a similar class exists for Excel extraction)
+# Extract data from the Excel file
 from Docs2KG.kg.excel_layout_kg import ExcelLayoutKG
 excel_file = "data/input/office_market_2024.xlsx"
 excel_layout_kg = ExcelLayoutKG(excel_file=excel_file)
 excel_layout_kg.create_kg()
 
-# Extract data from the email (assuming a similar class exists for email extraction)
+# Extract data from the email
 from Docs2KG.kg.email_layout_kg import EmailLayoutKG
 email_file = "data/input/report_summary.eml"
 email_layout_kg = EmailLayoutKG(email_file=email_file)
@@ -56,11 +56,12 @@ from Docs2KG.modules.llm.markdown2json import LLMMarkdown2Json
 
 pdf_file = 'data/input/OMR241-Chartbook.pdf'
 output_folder = 'data/output/market_report'
-
+scanned_pdf = False
 scanned_or_exported = get_scanned_or_exported(pdf_file)
 if scanned_or_exported == PDF_TYPE_SCANNED:
     pdf2tables = PDF2Tables(pdf_file)
     pdf2tables.extract2tables(output_csv=True)
+    scanned_pdf = True
 else:
     pdf_2_blocks = PDF2Blocks(pdf_file)
     blocks_dict = pdf_2_blocks.extract_df(output_csv=True)
@@ -72,6 +73,9 @@ else:
     input_md_file = output_folder + "/texts/md.csv"
     markdown2json = LLMMarkdown2Json(input_md_file, llm_model_name="gpt-3.5-turbo")
     markdown2json.extract2json()
+
+pdf_layout_kg = LayoutKG(output_folder, scanned_pdf=scanned_pdf)
+pdf_layout_kg.create_kg()
 
 
 ```
@@ -89,6 +93,7 @@ semantic_kg_excel.add_semantic_kg()
 semantic_kg_email = SemanticKG(folder_path=email_layout_kg.output_dir, input_format="email", llm_enabled=True)
 semantic_kg_email.add_semantic_kg()
 
+# input_format="pdf_scanned" for scanned PDFs
 semantic_kg_pdf = SemanticKG(folder_path=output_folder, input_format="pdf", llm_enabled=True)
 semantic_kg_pdf.add_semantic_kg()
 
@@ -102,7 +107,7 @@ json_2_triplets_excel.transform()
 json_2_triplets_email = JSON2Triplets(email_layout_kg.output_dir)
 json_2_triplets_email.transform()
 
-json_2_triplets_pdf = JSON2Triplets(output_folder)
+json_2_triplets_pdf = JSON2Triplets(pdf_layout_kg.output_dir)
 json_2_triplets_pdf.transform()
 
 ```
@@ -124,7 +129,7 @@ neo4j_loader_excel.load_data()
 neo4j_loader_email = Neo4jLoader(uri, username, password, email_layout_kg.output_dir / "kg" / "triplets_kg.json", clean=True)
 neo4j_loader_email.load_data()
 
-neo4j_loader_pdf = Neo4jLoader(uri, username, password, output_folder / "kg" / "triplets_kg.json", clean=True)
+neo4j_loader_pdf = Neo4jLoader(uri, username, password, pdf_layout_kg.output_dir / "kg" / "triplets_kg.json", clean=True)
 neo4j_loader_pdf.load_data()
 
 neo4j_loader_web.close()
@@ -135,8 +140,8 @@ neo4j_loader_pdf.close()
 ```
 
 ### 4. Entity Search and Question Answering:
-    Demonstrate entity search capabilities.
-    Answer specific questions about the office market using the knowledge graph.
+Demonstrate entity search capabilities.
+Answer specific questions about the office market using the knowledge graph.
 
 ```sh
 from py2neo import Graph
