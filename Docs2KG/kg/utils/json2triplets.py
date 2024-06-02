@@ -325,6 +325,9 @@ class JSON2Triplets:
                     [i for i in subject_ner_type if i.isalnum() or i == " "]
                 )
                 subject_ner_type = subject_ner_type.replace(" ", "_")
+                # object_ner_type and subject_ner_type can not start with number
+                if subject_ner_type and subject_ner_type[0].isdigit():
+                    continue
                 self.triplets_json["nodes"].append(
                     {
                         "uuid": subject_uuid,
@@ -342,6 +345,8 @@ class JSON2Triplets:
                     [i for i in object_ner_type if i.isalnum() or i == " "]
                 )
                 object_ner_type = object_ner_type.replace(" ", "_")
+                if object_ner_type and object_ner_type[0].isdigit():
+                    continue
                 self.triplets_json["nodes"].append(
                     {
                         "uuid": object_uuid,
