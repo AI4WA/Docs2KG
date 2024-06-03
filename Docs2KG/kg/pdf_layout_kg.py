@@ -6,6 +6,7 @@ from uuid import uuid4
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 
+from Docs2KG.utils.empty_check import empty_check
 from Docs2KG.utils.get_logger import get_logger
 from Docs2KG.utils.rect import BlockFinder
 
@@ -159,6 +160,9 @@ class PDFLayoutKG:
         Loop the image, assign it under the proper page
         If the page not exist, then add a page node
         """
+        block_images = self.folder_path / "images" / "blocks_images.csv"
+        if empty_check(block_images):
+            return
         images_df = pd.read_csv(self.folder_path / "images" / "blocks_images.csv")
         for index, row in images_df.iterrows():
             page_number = row["page_number"]
@@ -227,6 +231,9 @@ class PDFLayoutKG:
         `link_table_to_context`
 
         """
+        tables = self.folder_path / "tables" / "tables.csv"
+        if empty_check(tables):
+            return
         table_df = pd.read_csv(self.folder_path / "tables" / "tables.csv")
         for index, row in table_df.iterrows():
             logger.info(f"Processing table {index}")
@@ -249,6 +256,9 @@ class PDFLayoutKG:
         """
         Construct the image knowledge graph
         """
+        block_images = self.folder_path / "images" / "blocks_images.csv"
+        if empty_check(block_images):
+            return
         images_df = pd.read_csv(self.folder_path / "images" / "blocks_images.csv")
         text_block_df = pd.read_csv(self.folder_path / "texts" / "blocks_texts.csv")
         logger.debug(text_block_df.columns.tolist())
@@ -336,6 +346,9 @@ class PDFLayoutKG:
         2. We have bbox of the table, so we can find the nearby text block, and link them together
 
         """
+        tables = self.folder_path / "tables" / "tables.csv"
+        if empty_check(tables):
+            return
         table_df = pd.read_csv(self.folder_path / "tables" / "tables.csv")
         text_block_df = pd.read_csv(self.folder_path / "texts" / "blocks_texts.csv")
         for index, row in table_df.iterrows():
