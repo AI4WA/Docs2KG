@@ -54,4 +54,7 @@ setup(
         "Programming Language :: Python :: 3.10",
     ],
     url="https://docs2kg.ai4wa.com",
+    project_urls={
+        "Source": "https://github.com/AI4WA/Docs2KG",
+    },
 )
