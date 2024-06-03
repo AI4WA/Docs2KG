@@ -43,12 +43,17 @@ setup(
     classifiers=[
         # Classifiers help users find your project by categorizing it
         "Development Status :: 3 - Alpha",
-        "Intended Audience :: Developers, Researchers, Data Scientists, Data Engineers",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Science/Research",
         # license: GNU LESSER GENERAL PUBLIC LICENSE
         "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
         # topic
-        "Topic :: Knowledge Graph Construction, Large Language Model, "
-        "Machine Learning, Data Engineering, LLM, Retrieval Augmented Generation",
+        "Topic :: Knowledge Graph Construction",
+        "Topic :: Natural Language Processing",
+        "Topic :: Machine Learning",
+        "Topic :: Data Engineering",
+        "Topic :: Large Language Models",
+        "Topic :: Retrieval Augmented Generation",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
