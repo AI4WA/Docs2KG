@@ -3,9 +3,10 @@
 **Unified Knowledge Graph Construction from Heterogeneous Documents Assisted by Large
 Language Models**
 
+![PyPI](https://img.shields.io/pypi/v/Docs2KG)
+[![Demo](https://img.shields.io/badge/Demo-Available-blue)](https://docs2kg.ai4wa.com/Video/)
 ![Lint](https://github.com/AI4WA/Docs2KG/actions/workflows/lint.yml/badge.svg)
 ![Documentation](https://github.com/AI4WA/Docs2KG/actions/workflows/docs.yml/badge.svg)
-[![Demo](https://img.shields.io/badge/Demo-Available-blue)](https://docs2kg.ai4wa.com/Video/)
 ![Status](https://img.shields.io/badge/Status-Work%20in%20Progress-yellow)
 
 ## Installation
@@ -15,8 +16,6 @@ We have published the package to PyPi, you can install it via:
 ```bash
 pip install Docs2KG
 ```
-
-PyPi: [Docs2KG](https://pypi.org/project/Docs2KG/)
 
 ---
 
