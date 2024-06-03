@@ -28,7 +28,7 @@ setup(
     description="Unified Knowledge Graph Construction from Heterogeneous Documents Assisted by Large Language Models",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    version="0.1.1",
+    version="0.0.7",
     packages=find_packages(),  # Adjust the location where setuptools looks for packages
     include_package_data=True,  # To include other types of files specified in MANIFEST.in or found in your packages
     install_requires=read_requirements(),
