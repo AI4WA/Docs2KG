@@ -29,3 +29,5 @@ extra:
       link: https://github.com/AI4WA/Docs2KG
     - icon: fontawesome/brands/linkedin
       link: https://www.linkedin.com/company/ai4wa
+    - icon: fontawesome/solid/box-open
+      link: https://pypi.org/project/Docs2KG/
