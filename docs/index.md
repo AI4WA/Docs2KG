@@ -1,6 +1,25 @@
 # [Welcome to Docs2KG](https://ai4wa.com)
 
-**An Open Source Framework for Transforming Unstructured Data into Unified Knowledge Graph**
+**Unified Knowledge Graph Construction from Heterogeneous Documents Assisted by Large
+Language Models**
+
+![PyPI](https://img.shields.io/pypi/v/Docs2KG)
+[![Demo](https://img.shields.io/badge/Demo-Available-blue)](https://docs2kg.ai4wa.com/Video/)
+![Lint](https://github.com/AI4WA/Docs2KG/actions/workflows/lint.yml/badge.svg)
+![Documentation](https://github.com/AI4WA/Docs2KG/actions/workflows/docs.yml/badge.svg)
+![Status](https://img.shields.io/badge/Status-Work%20in%20Progress-yellow)
+
+## Installation
+
+We have published the package to PyPi, you can install it via:
+
+```bash
+pip install Docs2KG
+```
+
+---
+
+## Motivation
 
 Three pillars of the LLM applications in our opinion:
 
@@ -8,8 +27,10 @@ Three pillars of the LLM applications in our opinion:
 - RAG
 - LLM
 
-Most of the tools in the market nowadays are focusing on the Retrieval Augmented Generation (RAG) pipelines or
+Most of the tools in the market nowadays are focusing on the **Retrieval Augmented Generation (RAG) pipelines** or
 How to get Large Language Models (LLMs) to run locally.
+
+Typical tools include: Ollama, LangChain, LLamaIndex, etc.
 
 However, to make sure the wider community can benefit from the latest research, we need to first solve the data problem.
 
@@ -19,16 +40,16 @@ form, and distributed in different places.
 
 So the first challenges will be:
 
-- How can we easily process the unstructured data into a centralized place?
-- What is the best way to organize the data within the centralized place?
+- **How can we easily process the unstructured data into a centralized place?**
+- **What is the best way to organize the data within the centralized place?**
 
 ## Proposed Solution
 
 This package is a proposed solution to the above challenges.
 
 - We developed the tool for the wider community to easily process the unstructured data into a centralized place.
-- We proposed a way to organize the data within the centralized place, via a Unified Knowledge Graph altogether with
-  semi-structured data.
+- We proposed a way to organize the data within the centralized place, via a Unified Multimodal Knowledge Graph
+  altogether with semi-structured data.
 
 ### Overall Architecture
 
@@ -36,21 +57,19 @@ The overall workflow will be:
 
 ![img.png](images/Docs2KG.jpg)
 
-## System Architecture
+### Implemented System Architecture
 
 ![img.png](images/Modules.jpg)
 
-### PDF
+### Unified Multimodal Knowledge Graph
 
-The Main data under this category is PDF.
-
-So we need to be able to extract the text and images from the PDF.
-
-## Unified Multimodal Knowledge Graph
+How we construct this unified multimodal knowledge graph step by step:
 
 ![img.png](images/KGConstruction.jpg)
 
-## Development Setup
+---
+
+## Setup and Development
 
 ```bash
 python3 -m venv venv
