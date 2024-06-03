@@ -48,12 +48,7 @@ setup(
         # license: GNU LESSER GENERAL PUBLIC LICENSE
         "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
         # topic
-        "Topic :: Knowledge Graph Construction",
-        "Topic :: Natural Language Processing",
-        "Topic :: Machine Learning",
-        "Topic :: Data Engineering",
-        "Topic :: Large Language Models",
-        "Topic :: Retrieval Augmented Generation",
+        "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
