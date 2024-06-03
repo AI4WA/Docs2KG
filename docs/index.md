@@ -11,7 +11,9 @@ Language Models**
 
 ## Installation
 
-We have published the package to PyPi, you can install it via:
+We have published the package to PyPi: [Docs2KG](https://pypi.org/project/Docs2KG/),
+
+You can install it via:
 
 ```bash
 pip install Docs2KG
