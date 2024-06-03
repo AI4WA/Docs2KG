@@ -1,4 +1,3 @@
-import json
 from typing import List
 
 import numpy as np
@@ -59,11 +58,13 @@ class Neo4jRAG:
 
         # calculate the similarity
         # using tqdm to show the progress bar
-
-        df["content_similarity"] = df["content_embedding"].apply(
+        tqdm.pandas()
+        logger.info("Calculating the Content similarity")
+        df["content_similarity"] = df["content_embedding"].progress_apply(
             lambda x: self.cosine_similarity(x, query_embedding)
         )
-        df["meta_similarity"] = df["meta_embedding"].apply(
+        logger.info("Calculating the meta similarity")
+        df["meta_similarity"] = df["meta_embedding"].progress_apply(
             lambda x: self.cosine_similarity(x, query_embedding)
         )
 
