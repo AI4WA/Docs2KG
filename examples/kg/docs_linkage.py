@@ -1,7 +1,8 @@
-from Docs2KG.kg.docs_linkage import DocsLinkage
-from Docs2KG.utils.constants import DATA_INPUT_DIR
-from Docs2KG.kg.utils.neo4j_connector import Neo4jLoader
 import json
+
+from Docs2KG.kg.docs_linkage import DocsLinkage
+from Docs2KG.kg.utils.neo4j_connector import Neo4jLoader
+from Docs2KG.utils.constants import DATA_INPUT_DIR
 
 if __name__ == "__main__":
     input_folder = DATA_INPUT_DIR / "docslinkage" / "docs.json"
