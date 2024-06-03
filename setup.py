@@ -8,21 +8,27 @@ def read_requirements():
     return requirements
 
 
+with open("README.md", "r", encoding="utf-8") as fh:
+    long_description = fh.read()
+
 setup(
     name="Docs2KG",
+    author="AI4WA",
+    author_email="admin@ai4wa.com",
+    description="Unified Knowledge Graph Construction from Heterogeneous Documents Assisted by Large Language Models",
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     version="0.1.0",
     packages=find_packages(),  # Adjust the location where setuptools looks for packages
     include_package_data=True,  # To include other types of files specified in MANIFEST.in or found in your packages
     install_requires=read_requirements(),
-    python_requires=">=3.6",  # Specify your Python version compatibility
+    python_requires=">=3.8",  # Specify your Python version compatibility
     classifiers=[
         # Classifiers help users find your project by categorizing it
         "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
-        "License :: OSI Approved :: MIT License",  # Adjust the license accordingly
-        "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.6",
-        "Programming Language :: Python :: 3.7",
+        # license: GNU LESSER GENERAL PUBLIC LICENSE
+        "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
