@@ -102,7 +102,11 @@ class Neo4jLoader:
             properties["labels"] = labels
 
             # if the value of the property is a dictionary or a list, remove it
-            keys_to_remove = [key for key, value in properties.items() if isinstance(value, (dict, list))]
+            keys_to_remove = [
+                key
+                for key, value in properties.items()
+                if isinstance(value, (dict, list))
+            ]
             for key in keys_to_remove:
                 properties.pop(key)
 
