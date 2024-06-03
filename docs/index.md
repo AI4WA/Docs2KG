@@ -38,7 +38,7 @@ The overall workflow will be:
 
 ## System Architecture
 
-![img.png](images/modules.jpg)
+![img.png](images/Modules.jpg)
 
 ### PDF
 
