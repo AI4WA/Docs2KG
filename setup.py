@@ -1,4 +1,5 @@
 from setuptools import find_packages, setup
+import re
 
 
 def read_requirements():
@@ -10,6 +11,15 @@ def read_requirements():
 
 with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
+    # then for all images inside the markdown
+    # add the url https://github.com/AI4WA/Docs2KG/blob/main to the image path
+    images = re.findall(r"!\[.*\]\((.*)\)", long_description)
+    for image in images:
+        long_description = long_description.replace(
+            image, "https://github.com/AI4WA/Docs2KG/blob/main/" + image
+        )
+    # then for all links inside the markdown
+
 
 setup(
     name="Docs2KG",
