@@ -17,12 +17,13 @@ with open("README.md", "r", encoding="utf-8") as fh:
     images = re.findall(r"!\[.*\]\((.*)\)", long_description)
 
     for image in images:
+        if "http" in image:
+            continue
         long_description = long_description.replace(
             image, "https://raw.githubusercontent.com/AI4WA/Docs2KG/main/" + image
         )
 
 # get the version from GITHUB_REF_NAME
-
 version = os.getenv("GITHUB_REF_NAME", None)
 if not version:
     raise ValueError("Version not found in GITHUB_REF_NAME")
