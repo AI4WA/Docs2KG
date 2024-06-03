@@ -1,5 +1,6 @@
 from setuptools import find_packages, setup
 import re
+import os
 
 
 def read_requirements():
@@ -20,6 +21,11 @@ with open("README.md", "r", encoding="utf-8") as fh:
         )
     # then for all links inside the markdown
 
+# get the version from GITHUB_REF_NAME
+
+version = os.getenv("GITHUB_REF_NAME", None)
+if not version:
+    raise ValueError("Version not found in GITHUB_REF_NAME")
 
 setup(
     name="Docs2KG",
@@ -28,7 +34,7 @@ setup(
     description="Unified Knowledge Graph Construction from Heterogeneous Documents Assisted by Large Language Models",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    version="0.1.1",
+    version=version,
     packages=find_packages(),  # Adjust the location where setuptools looks for packages
     include_package_data=True,  # To include other types of files specified in MANIFEST.in or found in your packages
     install_requires=read_requirements(),
