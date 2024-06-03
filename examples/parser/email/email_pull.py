@@ -1,8 +1,8 @@
 from Docs2KG.parser.email.utils.email_connector import EmailConnector
 
 if __name__ == "__main__":
-    email_address = ""
-    password = ""
+    email_address = "findperth.com@gmail.com"
+    password = "ypanrwfvzqbpstzn"
     imap_server = "imap.gmail.com"
     port = 993
     email_connector = EmailConnector(
