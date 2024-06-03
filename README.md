@@ -41,9 +41,9 @@ The overall workflow will be:
 
 ![img.png](docs/images/Docs2KG.jpg)
 
-## Unstructured Data Processing
+## System Architecture
 
-![img.png](docs/images/DataPreprocessing.jpg)
+![img.png](docs/images/modules.jpg)
 
 ### PDF
 

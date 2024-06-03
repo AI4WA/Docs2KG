@@ -36,9 +36,9 @@ The overall workflow will be:
 
 ![img.png](images/Docs2KG.jpg)
 
-## Unstructured Data Processing
+## System Architecture
 
-![img.png](images/DataPreprocessing.jpg)
+![img.png](images/modules.jpg)
 
 ### PDF
 
@@ -46,7 +46,7 @@ The Main data under this category is PDF.
 
 So we need to be able to extract the text and images from the PDF.
 
-## Unified Knowledge Graph
+## Unified Multimodal Knowledge Graph
 
 ![img.png](images/KGConstruction.jpg)
 
