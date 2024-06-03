@@ -6,36 +6,12 @@ from uuid import uuid4
 import pandas as pd
 from sentence_transformers import SentenceTransformer
 
+from Docs2KG.kg.constants import HTML_TAGS
 from Docs2KG.utils.empty_check import empty_check
 from Docs2KG.utils.get_logger import get_logger
 from Docs2KG.utils.rect import BlockFinder
 
 logger = get_logger(__name__)
-
-HTML_TAGS = [
-    "html",
-    "head",
-    "title",
-    "h1",
-    "h2",
-    "h3",
-    "h4",
-    "h5",
-    "h6",
-    "p",
-    "a",
-    "img",
-    "div",
-    "span",
-    "table",
-    "tr",
-    "document",
-    "root",
-    "strong",
-    "footer",
-    "ul",
-    "li",
-]
 
 
 class PDFLayoutKG:
