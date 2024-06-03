@@ -100,6 +100,12 @@ class Neo4jLoader:
 
             properties["uuid"] = node["uuid"]
             properties["labels"] = labels
+
+            # if the value of the property is a dictionary or a list, remove it
+            keys_to_remove = [key for key, value in properties.items() if isinstance(value, (dict, list))]
+            for key in keys_to_remove:
+                properties.pop(key)
+
             properties_query = ", ".join(
                 [
                     f"{key.replace('.', '_')}: ${key}"
