@@ -51,4 +51,8 @@ setup(
         "Programming Language :: Python :: 3.10",
     ],
     url="https://docs2kg.ai4wa.com",
+    # add intended audience
+    intented_audience="Developers, Researchers, Data Scientists, Data Engineers",
+    topic="Knowledge Graph Construction, Large Language Model, "
+    "Machine Learning, Data Engineering, LLM, Retrieval Augmented Generation",
 )
