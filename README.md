@@ -69,7 +69,7 @@ How we construct this unified multimodal knowledge graph step by step:
 
 ---
 
-## Setup and Developement
+## Setup and Development
 
 ```bash
 python3 -m venv venv
