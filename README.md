@@ -1,6 +1,7 @@
-# Docs2KG
+# Open Source Framework: Docs2KG
 
-**An Open Source Framework for Transforming Unstructured Data into Unified Knowledge Graph**
+**Unified Knowledge Graph Construction from Heterogeneous Documents Assisted by Large
+Language Models**
 
 ![Lint](https://github.com/AI4WA/Docs2KG/actions/workflows/lint.yml/badge.svg)
 ![Documentation](https://github.com/AI4WA/Docs2KG/actions/workflows/docs.yml/badge.svg)
