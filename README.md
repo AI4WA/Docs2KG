@@ -29,7 +29,7 @@ The downstream usage examples is also included.
 
 Video is available at [Demo Docs2KG](https://docs2kg.ai4wa.com/Video/)
 
-The tutorial details is available at [Tutorial Docs2KG](https://docs2kg.ai4wa.com/Tutorial/)
+The tutorial details is available at [Tutorial Docs2KG](https://docs2kg.ai4wa.com/Tutorial/GettingStarted/)
 
 Which includes:
 
