@@ -21,6 +21,32 @@ pip install Docs2KG
 
 ---
 
+## Tutorial
+
+We have a demonstration to walk through the components of Docs2KG.
+
+The downstream usage examples is also included.
+
+Video is available at [Demo Docs2KG](https://docs2kg.ai4wa.com/Video/)
+
+The tutorial details is available at [Tutorial Docs2KG](https://docs2kg.ai4wa.com/Tutorial/)
+
+Which includes:
+
+- [How to get started with Docs2KG?](https://docs2kg.ai4wa.com/Tutorial/GettingStarted/)
+- [How to process the documents with Docs2KG?](https://docs2kg.ai4wa.com/Tutorial/Processing/)
+- [Modules in Docs2KG?](https://docs2kg.ai4wa.com/Tutorial/Modules/)
+- [How to construct the unified multimodal knowledge graph?](https://docs2kg.ai4wa.com/Tutorial/Construction/)
+- [How to load the unified multimodal knowledge graph into the GraphDB?](https://docs2kg.ai4wa.com/Tutorial/Loader/)
+- [How to further enhance the unified multimodal knowledge graph?](https://docs2kg.ai4wa.com/Tutorial/Enhancement/)
+- [How to use the unified multimodal knowledge graph in downstream applications?](https://docs2kg.ai4wa.com/Tutorial/Applications/)
+
+We also provide the Example Codes in [Example Codes Docs2KG](https://docs2kg.ai4wa.com/examples/parser/pdf/pdf_process/)
+
+The source codes documentation is available at [Docs2KG Documentation](https://docs2kg.ai4wa.com/sources/rag/neo4j_rag/)
+
+---
+
 ## Motivation
 
 Three pillars of the LLM applications in our opinion:
@@ -45,6 +71,8 @@ So the first challenges will be:
 - **How can we easily process the unstructured data into a centralized place?**
 - **What is the best way to organize the data within the centralized place?**
 
+---
+
 ## Proposed Solution
 
 This package is a proposed solution to the above challenges.
@@ -63,8 +91,6 @@ Unlike existing approaches that focus on specific data sources or pre-designed s
 extensible solution that can adapt to various document structures and content types.
 The proposed framework not only simplifies data processing but also improves the interpretability of
 models across diverse domains.
-
-Video is available at [Video Docs2KG](https://docs2kg.ai4wa.com/Video/)
 
 ### Overall Architecture
 
@@ -137,3 +163,5 @@ pip install -r requirements.dev.txt
 
 pip install -e .
 ```
+
+---
