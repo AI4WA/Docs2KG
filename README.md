@@ -29,22 +29,21 @@ The downstream usage examples is also included.
 
 Video is available at [Demo Docs2KG](https://docs2kg.ai4wa.com/Video/)
 
-The tutorial details is available at [Tutorial Docs2KG](https://docs2kg.ai4wa.com/Tutorial/GettingStarted/)
+The tutorial details is available at [Tutorial Docs2KG](https://docs2kg.ai4wa.com/Tutorial/1.GettingStarted/)
 
 Which includes:
 
-- [How to get started with Docs2KG?](https://docs2kg.ai4wa.com/Tutorial/GettingStarted/)
-- [How to process the documents with Docs2KG?](https://docs2kg.ai4wa.com/Tutorial/Processing/)
-- [Modules in Docs2KG?](https://docs2kg.ai4wa.com/Tutorial/Modules/)
-- [How to construct the unified multimodal knowledge graph?](https://docs2kg.ai4wa.com/Tutorial/Construction/)
-- [How to load the unified multimodal knowledge graph into the GraphDB?](https://docs2kg.ai4wa.com/Tutorial/Loader/)
-- [How to further enhance the unified multimodal knowledge graph?](https://docs2kg.ai4wa.com/Tutorial/Enhancement/)
-- [How to use the unified multimodal knowledge graph in downstream applications?](https://docs2kg.ai4wa.com/Tutorial/Applications/)
+- [How to get started with Docs2KG?](https://docs2kg.ai4wa.com/Tutorial/1.GettingStarted/)
+- [How to process the documents with Docs2KG?](https://docs2kg.ai4wa.com/Tutorial/2.DualPathProcessing/)
+- [Modules in Docs2KG?](https://docs2kg.ai4wa.com/Tutorial/3.Modules/)
+- [How to construct the unified multimodal knowledge graph?](https://docs2kg.ai4wa.com/Tutorial/4.Construction/)
+- [How to load the unified multimodal knowledge graph into the GraphDB?](https://docs2kg.ai4wa.com/Tutorial/5.Loader/)
+- [How to further enhance the unified multimodal knowledge graph?](https://docs2kg.ai4wa.com/Tutorial/6.Enhancement/)
+- [How to use the unified multimodal knowledge graph in downstream applications?](https://docs2kg.ai4wa.com/Tutorial/7.Applications/)
 
 We also provide the Example Codes in [Example Codes Docs2KG](https://docs2kg.ai4wa.com/examples/parser/pdf/pdf_process/)
 
 The source codes documentation is available at [Docs2KG Documentation](https://docs2kg.ai4wa.com/sources/rag/neo4j_rag/)
-
 ---
 
 ## Motivation
