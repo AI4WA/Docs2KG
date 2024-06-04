@@ -53,21 +53,77 @@ This package is a proposed solution to the above challenges.
 - We proposed a way to organize the data within the centralized place, via a Unified Multimodal Knowledge Graph
   altogether with semi-structured data.
 
+Given the nature of unstructured and heterogeneous data, information extraction and knowledge representation pose
+significant challenges.
+In this package, we introduce **Docs2KG**, a novel framework designed to extract multi-modal information from diverse
+and heterogeneous unstructured data sources, including emails, web pages, PDF files, and Excel files.
+Docs2KG dynamically generates a unified knowledge graph that represents the extracted information, enabling efficient
+querying and exploration of the data.
+Unlike existing approaches that focus on specific data sources or pre-designed schemas, Docs2KG offers a flexible and
+extensible solution that can adapt to various document structures and content types.
+The proposed framework not only simplifies data processing but also improves the interpretability of
+models across diverse domains.
+
+Video is available at [Video Docs2KG](https://docs2kg.ai4wa.com/Video/)
+
 ### Overall Architecture
 
-The overall workflow will be:
+The overall architecture design will be shown in:
 
 ![img.png](docs/images/Docs2KG.jpg)
+
+The data from multiple sources will be processed by the **Dual-Path Data Processing**.
+Some of the data, for example, the exported PDF files, Excel files, etc., they can be processed and handle by
+programming parser.
+So it will be converted generally into the markdown, and then transformed into the unified knowledge graph.
+For data like scanned PDF, images, etc., we will need the help from Doc Layout Analysis and OCR to extract the
+information,
+then we will convert the extracted information into the markdown, and then transformed into the unified knowledge graph.
+
+Then the unified multimodal knowledge graph will be generated based on the outputs:
+
+- Text
+    - Markdown
+    - Text2KG Output
+- Table CSV
+- Table Image
+- Image
+
+The unified multimodal knowledge graph will have mainly two aspects:
+
+- Layout Knowledge Graph
+    - The layout of the documents are helping us to understand the structure of the documents.
+    - So it will be also necessary and important represented within the unified multimodal knowledge graph.
+- Semantic Knowledge Graph
+    - The semantic connections are the part our brain will be interested in when we read the documents.
+    - So with the help of the LLM, we can try to extract the semantic connections from the documents.
+    - Which can help human to understand the documents better from the semantic perspective.
 
 ### Implemented System Architecture
 
 ![img.png](docs/images/Modules.jpg)
 
-### Unified Multimodal Knowledge Graph
+The overall steps include:
 
-How we construct this unified multimodal knowledge graph step by step:
-
-![img.png](docs/images/KGConstruction.jpg)
+- Data Processing
+    - Dual-Path Data Processing
+    - Get the documents from diverse sources with diverse formats into Markdown, CSV, JSON, etc.
+- Unified Multimodal Knowledge Graph Construction
+- GraphDB Loader
+    - Load the unified multimodal knowledge graph into the GraphDB
+    - We use Neo4j as the GraphDB in this project
+- Further Enhancement
+    - The KG schema is generated and dynamic, and will not be perfect at the beginning.
+    - So we need to further enhance the KG schema
+        - Via automatic schema merge: node label frequency based merge, label semantic similarity based merge
+        - Via human in the loop: human review and further enhance the KG schema
+- Downstream Applications
+    - Traditional Cypher Query: NLP Query to Cypher Query (Can with help from LLM)
+    - Vector Based RAG:
+        - Get the embedding of each node first.
+        - Then use the embedding of the query to do the similarity search to extract the anchor nodes within the graph.
+        - Use these nodes as the anchor nodes, doing multi hop information extraction to augment the query.
+        - Use LLM to do the final generation based on the augmented query.
 
 ---
 

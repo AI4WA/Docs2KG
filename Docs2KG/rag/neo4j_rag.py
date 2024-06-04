@@ -22,7 +22,7 @@ class Neo4jRAG:
         """
         self.driver = GraphDatabase.driver(uri, auth=(user, password))
 
-    def retrieval(self, query: str, top_k: int = 1) -> dict:
+    def retrieval(self, query: str, top_k: int = 10) -> dict:
         """
         Retrieve the best matching node from the graph based on the query
 
@@ -126,13 +126,22 @@ class Neo4jRAG:
             WHERE startNode.uuid IN {uuids}
             RETURN endNode
             """
+        logger.info(query)
         try:
             with self.driver.session() as session:
                 result = session.run(query)
                 for record in result:
-                    node = record["m"]
+                    logger.debug(record)
+                    node = record["endNode"]
                     node_properties = dict(node.items())
-                    nodes.append(node_properties)
+                    logger.info(node_properties.keys())
+
+                    nodes.append(
+                        {
+                            "uuid": node_properties["uuid"],
+                            "content": node_properties.get("content", ""),
+                        }
+                    )
         except Exception as e:
             logger.error("Failed to fetch connected nodes: %s", e)
             raise
