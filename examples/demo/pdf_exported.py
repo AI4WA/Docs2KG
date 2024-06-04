@@ -35,9 +35,9 @@ if __name__ == "__main__":
     """
 
     # you can name your file here
-    pdf_file = DATA_INPUT_DIR / "Excellent_Example_Report.pdf"
+    pdf_file = DATA_INPUT_DIR / "historic information.pdf"
 
-    output_folder = DATA_OUTPUT_DIR / "Excellent_Example_Report.pdf"
+    output_folder = DATA_OUTPUT_DIR / "historic information.pdf"
     # the output will be default to `DATA_OUTPUT_DIR / "4.pdf" /` folder
     scanned_or_exported = get_scanned_or_exported(pdf_file)
     if scanned_or_exported == PDF_TYPE_SCANNED:
