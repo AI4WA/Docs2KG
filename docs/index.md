@@ -3,6 +3,7 @@
 **Unified Knowledge Graph Construction from Heterogeneous Documents Assisted by Large
 Language Models**
 
+[![Paper](https://img.shields.io/badge/Paper-View-green?style=flat&logo=adobeacrobatreader)](https://arxiv.org/pdf/2406.02962)
 ![PyPI](https://img.shields.io/pypi/v/Docs2KG)
 [![Demo](https://img.shields.io/badge/Demo-Available-blue)](https://docs2kg.ai4wa.com/Video/)
 ![Lint](https://github.com/AI4WA/Docs2KG/actions/workflows/lint.yml/badge.svg)
@@ -165,3 +166,18 @@ pip install -e .
 ```
 
 ---
+
+## Citation
+
+If you find this package useful, please consider citing our work:
+
+```bibtex
+@misc{sun2024docs2kg,
+      title={Docs2KG: Unified Knowledge Graph Construction from Heterogeneous Documents Assisted by Large Language Models}, 
+      author={Qiang Sun and Yuanyi Luo and Wenxiao Zhang and Sirui Li and Jichunyang Li and Kai Niu and Xiangrui Kong and Wei Liu},
+      year={2024},
+      eprint={2406.02962},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+```

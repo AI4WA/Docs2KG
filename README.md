@@ -3,6 +3,7 @@
 **Unified Knowledge Graph Construction from Heterogeneous Documents Assisted by Large
 Language Models**
 
+[![Paper](https://img.shields.io/badge/Paper-View-green?style=flat&logo=adobeacrobatreader)](https://arxiv.org/pdf/2406.02962)
 ![PyPI](https://img.shields.io/pypi/v/Docs2KG)
 [![Demo](https://img.shields.io/badge/Demo-Available-blue)](https://docs2kg.ai4wa.com/Video/)
 ![Lint](https://github.com/AI4WA/Docs2KG/actions/workflows/lint.yml/badge.svg)
