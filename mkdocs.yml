@@ -31,3 +31,6 @@ extra:
       link: https://www.linkedin.com/company/ai4wa
     - icon: fontawesome/solid/box-open
       link: https://pypi.org/project/Docs2KG/
+  analytics:
+    provider: google
+    property: G-3KY1SY1J0Q
