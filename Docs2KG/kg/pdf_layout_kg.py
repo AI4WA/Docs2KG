@@ -570,9 +570,12 @@ class PDFLayoutKG:
             if content.strip() == "":
                 continue
             for key, value in nearby_info_dict.items():
-                if content.strip() == value["content"].strip():
+                # get all the value to string to be consistent
+                content = str(content)
+                value_content = str(value["content"])
+                if content == value_content:
                     value["uuids"].append(child["uuid"])
-                elif self.text_bert_match(content, value["content"]):
+                elif self.text_bert_match(content, value_content):
                     value["uuids"].append(child["uuid"])
 
         return nearby_info_dict
