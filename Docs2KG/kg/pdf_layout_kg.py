@@ -269,14 +269,17 @@ class PDFLayoutKG:
                             "uuid": str(uuid4()),
                             "node_properties": {
                                 "text_block_bbox": text_block["bbox"],
-                                "content": text_block["text"],
+                                "content": str(text_block["text"]),
                                 "position": key,
                                 "text_block_number": int(text_block["block_number"]),
                             },
                             "children": [],
                         }
                     )
-                    nearby_info_dict[key] = {"content": text_block["text"], "uuids": []}
+                    nearby_info_dict[key] = {
+                        "content": str(text_block["text"]),
+                        "uuids": [],
+                    }
             """
             We also need to loop the nodes within this page
             if the text block is highly similar to a content node, then we can link them together
@@ -352,14 +355,17 @@ class PDFLayoutKG:
                             "uuid": str(uuid4()),
                             "node_properties": {
                                 "text_block_bbox": text_block["bbox"],
-                                "content": text_block["text"],
+                                "content": str(text_block["text"]),
                                 "position": key,
                                 "text_block_number": int(text_block["block_number"]),
                             },
                             "children": [],
                         }
                     )
-                    nearby_info_dict[key] = {"content": text_block["text"], "uuids": []}
+                    nearby_info_dict[key] = {
+                        "content": str(text_block["text"]),
+                        "uuids": [],
+                    }
             nearby_info_dict = self.link_image_to_tree_node(page_node, nearby_info_dict)
             for item in nearby_info:
                 key = item["node_properties"]["position"]
@@ -492,7 +498,7 @@ class PDFLayoutKG:
         """
         node_uuid = str(uuid4())
         node_properties = {
-            "content": node.get("content", ""),
+            "content": str(node.get("content", "")),
             "text": json.dumps(node) if tag == "table" else "",
             "records": node.get("children", []) if tag == "table" else [],
         }
@@ -566,12 +572,12 @@ class PDFLayoutKG:
         for child in page_node["children"]:
             # get the text
             content = child["node_properties"].get("content", "")
+            content = str(content)
             nearby_info_dict = self.link_image_to_tree_node(child, nearby_info_dict)
             if content.strip() == "":
                 continue
             for key, value in nearby_info_dict.items():
                 # get all the value to string to be consistent
-                content = str(content)
                 value_content = str(value["content"])
                 if content == value_content:
                     value["uuids"].append(child["uuid"])
