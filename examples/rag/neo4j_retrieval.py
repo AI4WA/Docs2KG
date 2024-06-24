@@ -1,19 +1,27 @@
+import argparse
+
 from Docs2KG.rag.neo4j_rag import Neo4jRAG
 from Docs2KG.utils.get_logger import get_logger
 
 logger = get_logger(__name__)
 
 if __name__ == "__main__":
-    uri = "bolt://localhost:7687"
-    username = "neo4j"
-    password = "testpassword"
+    args = argparse.ArgumentParser()
+    args.add_argument("--neo4j_uri", type=str, default="bolt://localhost:7687")
+    args.add_argument("--neo4j_username", type=str, default="neo4j")
+    args.add_argument("--neo4j_password", type=str, default="testpassword")
+    args.add_argument("--query", type=str, default=None)
 
-    rag = Neo4jRAG(uri, username, password)
-    query = (
-        "Can you show me all documents and their components"
-        "related to events that occurred in the years 2011 and 2021?"
+    args = args.parse_args()
+
+    rag = Neo4jRAG(
+        uri=args.neo4j_uri, username=args.neo4j_username, password=args.neo4j_password
     )
-    result = rag.retrieval(query)
+    """
+    Here we are using the retrieval method to get the top k content based on the query
+    We can have multiple strategies to get the top k content
+    """
+    result = rag.retrieval(query=args.query)
     logger.info(result)
 
     rag.retrieval_strategy_hops_away(
