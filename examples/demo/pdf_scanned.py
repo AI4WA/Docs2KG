@@ -55,7 +55,7 @@ if __name__ == "__main__":
         pdf_file = DATA_INPUT_DIR / "3.pdf"
     else:
         pdf_file = Path(args.pdf_file)
-    output_folder = DATA_OUTPUT_DIR / pdf_file.stem
+    output_folder = DATA_OUTPUT_DIR / pdf_file.name
 
     scanned_or_exported = get_scanned_or_exported(pdf_file)
     if scanned_or_exported == PDF_TYPE_SCANNED:
