@@ -108,7 +108,7 @@ if __name__ == "__main__":
 
         # next we will start to extract the layout knowledge graph first
 
-        layout_kg = PDFLayoutKG(output_folder, scanned_pdf=True)
+        layout_kg = PDFLayoutKG(output_folder, input_format="pdf_scanned")
         layout_kg.create_kg()
 
         # After this, you will have the layout.json in the `kg` folder
