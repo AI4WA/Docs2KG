@@ -15,7 +15,7 @@ if __name__ == "__main__":
     args = args.parse_args()
 
     rag = Neo4jRAG(
-        uri=args.neo4j_uri, username=args.neo4j_username, password=args.neo4j_password
+        uri=args.neo4j_uri, user=args.neo4j_username, password=args.neo4j_password
     )
     """
     Here we are using the retrieval method to get the top k content based on the query

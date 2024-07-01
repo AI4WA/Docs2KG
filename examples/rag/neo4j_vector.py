@@ -8,8 +8,10 @@ if __name__ == "__main__":
     args.add_argument("--neo4j_username", type=str, default="neo4j")
     args.add_argument("--neo4j_password", type=str, default="testpassword")
 
+    args = args.parse_args()
+
     neo4j_vector = Neo4jVector(
-        uri=args.neo4j_uri, username=args.neo4j_username, password=args.neo4j_password
+        uri=args.neo4j_uri, user=args.neo4j_username, password=args.neo4j_password
     )
     neo4j_vector.add_embedding()
     neo4j_vector.close()
