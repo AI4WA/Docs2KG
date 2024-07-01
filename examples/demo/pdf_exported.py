@@ -1,3 +1,6 @@
+import argparse
+from pathlib import Path
+
 from Docs2KG.kg.pdf_layout_kg import PDFLayoutKG
 from Docs2KG.kg.semantic_kg import SemanticKG
 from Docs2KG.kg.utils.json2triplets import JSON2Triplets
@@ -33,12 +36,26 @@ if __name__ == "__main__":
         - However, the LLM based looks like much better than the rule based, due to the noise in the PDF
     3. Graph Construction
     """
+    args = argparse.ArgumentParser()
+    args.add_argument(
+        "--pdf_file", type=str, default=None, help="The PDF File Absolute Path"
+    )
+    args.add_argument(
+        "--model_name", type=str, default="gpt-3.5-turbo", help="The model name"
+    )
+    args.add_argument("--neo4j_uri", type=str, default="bolt://localhost:7687")
+    args.add_argument("--neo4j_username", type=str, default="neo4j")
+    args.add_argument("--neo4j_password", type=str, default="testpassword")
 
-    # you can name your file here
-    pdf_file = DATA_INPUT_DIR / "historic information.pdf"
+    args = args.parse_args()
+    # if you want to run this script, you can run it with `python pdf_exported.py --pdf_file <pdf_file>`
+    if not args.pdf_file:
+        pdf_file = DATA_INPUT_DIR / "MESAJ084.pdf"
+    else:
+        pdf_file = Path(args.pdf_file)
 
-    output_folder = DATA_OUTPUT_DIR / "historic information.pdf"
-    # the output will be default to `DATA_OUTPUT_DIR / "4.pdf" /` folder
+    output_folder = DATA_OUTPUT_DIR / pdf_file.name
+
     scanned_or_exported = get_scanned_or_exported(pdf_file)
     if scanned_or_exported == PDF_TYPE_SCANNED:
         logger.info("This is a scanned pdf, we will handle it in another demo")
@@ -86,7 +103,7 @@ if __name__ == "__main__":
 
         markdown2json = LLMMarkdown2Json(
             input_md_file,
-            llm_model_name="gpt-3.5-turbo",
+            llm_model_name=args.model_name,
         )
         markdown2json.extract2json()
 
@@ -116,11 +133,14 @@ if __name__ == "__main__":
         # to get it quickly loaded into Neo4j
         # You can do is run the `docker compose -f examples/compose/docker-compose.yml up`
         # So we will have a Neo4j instance running, then you can run the `neo4j_connector.py` to load the data
-        uri = "bolt://localhost:7687"  # if it is a remote graph db, you can change it to the remote uri
-        username = "neo4j"
-        password = "testpassword"
         json_file_path = output_folder / "kg" / "triplets_kg.json"
 
-        neo4j_loader = Neo4jLoader(uri, username, password, json_file_path, clean=True)
+        neo4j_loader = Neo4jLoader(
+            uri=args.neo4j_uri,
+            username=args.neo4j_username,
+            password=args.neo4j_password,
+            json_file_path=json_file_path,
+            clean=True,
+        )
         neo4j_loader.load_data()
         neo4j_loader.close()
