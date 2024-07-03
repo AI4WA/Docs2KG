@@ -70,7 +70,9 @@ class PDF2Blocks(PDFParserBase):
         texts_df = pd.DataFrame(texts)
         images_df = pd.DataFrame(images)
         if output_csv:
-            texts_df.to_csv(self.text_output_dir / "blocks_texts.csv", index=False)
+            texts_df.to_csv(
+                self.text_output_dir / "blocks_texts.csv", index=False, escapechar="\\"
+            )
             images_df.to_csv(self.images_output_dir / "blocks_images.csv", index=False)
         return {
             "texts": texts_df,

@@ -40,7 +40,7 @@ class PDF2Text(PDFParserBase):
 
         df = pd.DataFrame(texts)
         if output_csv:
-            df.to_csv(self.text_output_dir / "text.csv", index=False)
+            df.to_csv(self.text_output_dir / "text.csv", index=False, escapechar="\\")
             return {
                 "text": text,
                 "output_file": self.text_output_dir / "text.csv",
@@ -73,7 +73,7 @@ class PDF2Text(PDFParserBase):
         df = pd.DataFrame(markdown_texts)
 
         if output_csv:
-            df.to_csv(self.text_output_dir / "md.csv", index=False)
+            df.to_csv(self.text_output_dir / "md.csv", index=False, escapechar="\\")
             return {
                 "md": md_text,
                 "output_file": self.text_output_dir / "md.csv",

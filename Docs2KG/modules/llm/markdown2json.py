@@ -391,7 +391,11 @@ class LLMMarkdown2Json:
                 "content": f"Convert the following markdown to JSON format:\n\n{markdown}",
             },
         ]
-        return self.llm_openai_call(messages)
+        try:
+            return self.llm_openai_call(messages)
+        except Exception as e:
+            logger.exception(e)
+            return ""
 
     def openai_content_json(self, markdown: str):
         """
@@ -418,7 +422,11 @@ class LLMMarkdown2Json:
                 "content": f"Convert the following markdown to JSON format:\n\n{markdown}",
             },
         ]
-        return self.llm_openai_call(messages)
+        try:
+            return self.llm_openai_call(messages)
+        except Exception as e:
+            logger.exception(e)
+            return ""
 
     def llm_openai_call(self, messages: List[dict]) -> str:
         """

@@ -36,13 +36,15 @@ class WebLayoutKG:
         self.url = url
         # extract the domain from the url, if it is http://example.com/sss, then the domain is https://example.com
         self.domain = f"{urlparse(url).scheme}://{urlparse(url).netloc}"
-
         self.output_dir = output_dir
         self.input_dir = input_dir
         self.quoted_url = quote(url, "")
         if self.output_dir is None:
             self.output_dir = DATA_OUTPUT_DIR / self.quoted_url
             self.output_dir.mkdir(parents=True, exist_ok=True)
+        if self.input_dir is None:
+            self.input_dir = DATA_INPUT_DIR
+            self.input_dir.mkdir(parents=True, exist_ok=True)
 
         self.download_html_file()
 
@@ -63,7 +65,7 @@ class WebLayoutKG:
         """
         response = requests.get(self.url)
         if response.status_code == 200:
-            with open(f"{DATA_INPUT_DIR}/index.html", "wb") as f:
+            with open(f"{self.input_dir}/index.html", "wb") as f:
                 f.write(response.content)
             logger.info(f"Downloaded the HTML file from {self.url}")
         else:
@@ -74,7 +76,7 @@ class WebLayoutKG:
         Create the knowledge graph from the HTML file
 
         """
-        with open(f"{DATA_INPUT_DIR}/index.html", "r") as f:
+        with open(f"{self.input_dir}/index.html", "r") as f:
             html_content = f.read()
         soup = BeautifulSoup(html_content, "html.parser")
         """
