@@ -62,6 +62,7 @@ if __name__ == "__main__":
     output = agent_manager.process_input("Hello, how are you?")
     logger.info(f"Output: {output}")
 
+    # agent_name can be the model path
     agent_manager = AgentManager(agent_name=None, agent_type="quantization")
     output = agent_manager.process_input("Hello, how are you?")
     logger.info(f"Output: {output}")
