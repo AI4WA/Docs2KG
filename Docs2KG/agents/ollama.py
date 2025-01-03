@@ -1,43 +1,32 @@
-from typing import Any, Dict, Optional
+from typing import Any
 
 import requests
 from loguru import logger
 from requests.adapters import HTTPAdapter, Retry
 
 from Docs2KG.agents.base import BaseAgent
-from Docs2KG.agents.config import OLLAMA_MODEL_CONFIGS
+from Docs2KG.utils.config import PROJECT_CONFIG
 
 
 class OllamaAgent(BaseAgent):
-    def __init__(self, name: str, api_base: Optional[str] = None):
+    def __init__(self, name: str):
         """
         Initialize OllamaAgent with model name and optional API base URL.
 
         Args:
             name: Name of the Ollama model to use (e.g., 'llama2', 'mistral')
-            api_base: Optional API base URL. If not provided, will use default from config
         """
         super().__init__(name)
-        self.model = self._init_model_config()
-        self.session = self._init_session(api_base)
+        self.session = self._init_session()
 
-    def _init_model_config(self) -> Dict[str, Any]:
-        """Initialize model configuration from predefined configs"""
-        model_name = self.name.lower()
-        config = OLLAMA_MODEL_CONFIGS.get(model_name)
-        if not config:
-            logger.error(f"No configuration found for model: {model_name}")
-            raise ValueError(f"Invalid model name: {model_name}")
-        return config
-
-    def _init_session(self, api_base: Optional[str] = None) -> requests.Session:
+    def _init_session(self) -> requests.Session:
         """Initialize requests session with retries and timeouts"""
         try:
             session = requests.Session()
 
             # Configure retries
             retries = Retry(
-                total=self.model.get("max_retries", 2),
+                total=PROJECT_CONFIG.ollama.max_retries,
                 backoff_factor=0.5,
                 status_forcelist=[500, 502, 503, 504],
             )
@@ -47,9 +36,7 @@ class OllamaAgent(BaseAgent):
             session.mount("https://", HTTPAdapter(max_retries=retries))
 
             # Set base URL
-            self.api_base = api_base or self.model.get(
-                "api_base", "http://localhost:11434"
-            )
+            self.api_base = PROJECT_CONFIG.ollama.api_base
 
             logger.info(
                 f"Successfully initialized Ollama session for model {self.name}"
@@ -76,38 +63,32 @@ class OllamaAgent(BaseAgent):
         Returns:
             Dict containing the model response and metadata
         """
-        logger.info(f"Using Ollama model: {self.model['model']}")
-        logger.info(f"Processing with configurations: {self.model}")
+        logger.info(f"Using Ollama model: {self.name}")
 
         try:
             # Prepare the request
             url = f"{self.api_base}/api/generate"
 
             payload = {
-                "model": self.model["model"],
+                "model": self.name,
                 "prompt": str(input_data),
-                "temperature": self.model.get("temperature", 0.7),
+                "temperature": PROJECT_CONFIG.ollama.temperature,
                 "stream": False,
-                "format": self.model.get("format", "json"),
+                "format": PROJECT_CONFIG.ollama.format,
             }
-
-            # Add optional parameters if they exist in config
-            for param in ["num_ctx", "top_k", "top_p", "num_predict"]:
-                if param in self.model:
-                    payload[param] = self.model[param]
 
             # Make the API call
             if reset_session:
                 self.reset_session()
             response = self.session.post(
-                url, json=payload, timeout=self.model.get("timeout", 30)
+                url, json=payload, timeout=PROJECT_CONFIG.ollama.timeout
             )
             response.raise_for_status()
 
             result = response.json()
 
             return {
-                "model": self.model["model"],
+                "model": self.name,
                 "input": input_data,
                 "status": "processed",
                 "response": result.get("response", ""),

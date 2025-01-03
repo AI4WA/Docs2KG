@@ -1,0 +1,28 @@
+openai:
+  api_key: "YOUR_API_KEY"
+  temperature: 0.7  # optional, defaults to 0.7
+  max_tokens: 2000  # optional, defaults to 2000
+  api_base: "https://api.openai.com/v1"
+  timeout: 60  # optional, defaults to 60
+  max_retries: 3  # optional, defaults to 3
+ollama:
+  api_base: "http://localhost:11434"
+  timeout: 60  # optional, defaults to 60
+  max_retries: 3  # optional, defaults to 3
+  temperature: 0.7  # optional, defaults to 0.7
+  context_window: 4096  # optional, defaults to 5
+  format: "json"  # optional, defaults to "json"
+  stream: false  # optional, defaults to false
+huggingface:
+  api_token: "YOUR_API_TOKEN"
+  api_base: "https://api-inference.huggingface.co"
+  timeout: 60  # optional, defaults to 60
+llamacpp:
+  context_length: 2048  # Maximum context length
+  num_threads: 4        # Number of CPU threads to use
+  gpu_layers: 0        # Number of layers to offload to GPU (0 for CPU-only)
+  max_tokens: 100      # Maximum number of tokens to generate
+  temperature: 0.7     # Temperature for sampling
+  top_p: 0.9          # Top-p sampling parameter
+  stop_tokens: [ "\n" ]  # Tokens that will stop generation
+  model_path: "YOUR_MODEL_PATH"

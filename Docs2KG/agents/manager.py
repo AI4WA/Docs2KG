@@ -51,9 +51,17 @@ class AgentManager:
 
 if __name__ == "__main__":
     # Example usage
-    # agent_manager = AgentManager(agent_name='gpt-4o', agent_type='cloud')
-    # output = agent_manager.process_input("Hello, how are you?")
-    # logger.info(f"Output: {output}")
+    agent_manager = AgentManager(agent_name="gpt-4o", agent_type="cloud")
+    output = agent_manager.process_input("Hello, how are you?")
+    logger.info(f"Output: {output}")
     agent_manager = AgentManager(agent_name="phi3.5", agent_type="ollama")
+    output = agent_manager.process_input("Hello, how are you?")
+    logger.info(f"Output: {output}")
+
+    agent_manager = AgentManager(agent_name="openai-community/gpt2", agent_type="hf")
+    output = agent_manager.process_input("Hello, how are you?")
+    logger.info(f"Output: {output}")
+
+    agent_manager = AgentManager(agent_name=None, agent_type="quantization")
     output = agent_manager.process_input("Hello, how are you?")
     logger.info(f"Output: {output}")

@@ -1,20 +1,5 @@
 from typing import Any, Dict
 
-CLOUD_MODEL_CONFIGS: Dict[str, Dict[str, Any]] = {
-    "gpt-4o": {
-        "model": "gpt-4o",
-        "max_tokens": 4096,
-        "temperature": 0.7,
-        "api_base": "https://api.openai.com/v1",
-    },
-    "gpt-4-turbo": {
-        "model": "gpt-4-1106-preview",
-        "max_tokens": 4096,
-        "temperature": 0.7,
-        "api_base": "https://api.openai.com/v1",
-    },
-}
-
 OLLAMA_MODEL_CONFIGS = {
     "llama2": {
         "model": "llama2",

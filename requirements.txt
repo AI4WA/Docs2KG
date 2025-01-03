@@ -18,3 +18,4 @@ sentence-transformers
 openpyxl
 neo4j
 loguru
+llama-cpp-python

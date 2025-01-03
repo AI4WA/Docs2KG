@@ -1,39 +1,22 @@
-from typing import Any, Dict, Optional
+from typing import Any
 
 from loguru import logger
 from openai import OpenAI
 
 from Docs2KG.agents.base import BaseAgent
-from Docs2KG.agents.config import CLOUD_MODEL_CONFIGS
-
-
-OPENAI_API_KEY = (
-    "sk-1234567890abcdef1234567890abcdef"  # Replace with your OpenAI API key
-)
+from Docs2KG.utils.config import PROJECT_CONFIG
 
 
 class CloudAgent(BaseAgent):
-    def __init__(self, name: str, api_key: Optional[str] = None):
+    def __init__(self, name: str):
         """
         Initialize CloudAgent with model name and optional API key.
 
         Args:
             name: Name of the model to use (e.g., 'gpt-4')
-            api_key: Optional OpenAI API key. If not provided, will look for
-                    OPENAI_API_KEY in environment variables or .env file
         """
         super().__init__(name)
-        self.model = self._init_model_config()
         self.client = self._init_openai_client()
-
-    def _init_model_config(self) -> Dict[str, Any]:
-        """Initialize model configuration from predefined configs"""
-        model_name = self.name.lower()
-        config = CLOUD_MODEL_CONFIGS.get(model_name, CLOUD_MODEL_CONFIGS["gpt-4o"])
-        if not config:
-            logger.error(f"No configuration found for model: {model_name}")
-            raise ValueError(f"Invalid model name: {model_name}")
-        return config
 
     def _init_openai_client(self) -> OpenAI:
         """
@@ -45,10 +28,10 @@ class CloudAgent(BaseAgent):
         try:
             # Initialize client with config
             client = OpenAI(
-                api_key=OPENAI_API_KEY,
-                base_url=self.model.get("api_base", "https://api.openai.com/v1"),
-                timeout=self.model.get("timeout", 30),
-                max_retries=self.model.get("max_retries", 2),
+                api_key=PROJECT_CONFIG.openai.api_key.get_secret_value(),
+                base_url=PROJECT_CONFIG.openai.api_base,
+                timeout=PROJECT_CONFIG.openai.timeout,
+                max_retries=PROJECT_CONFIG.openai.max_retries,
             )
 
             logger.info(f"Successfully initialized OpenAI client for model {self.name}")
@@ -68,23 +51,19 @@ class CloudAgent(BaseAgent):
         Returns:
             Dict containing the model response and metadata
         """
-        logger.info(f"Using cloud model: {self.model['model']}")
-        logger.info(f"Processing with configurations: {self.model}")
+        logger.info(f"Processing input with OpenAI: {input_data}")
 
         try:
             # Create chat completion with proper error handling
             response = self.client.chat.completions.create(
-                model=self.model["model"],
+                model=self.name,
                 messages=[{"role": "user", "content": str(input_data)}],
-                max_tokens=self.model.get("max_tokens", 4096),
-                temperature=self.model.get("temperature", 0.7),
-                top_p=self.model.get("top_p", 1.0),
-                presence_penalty=self.model.get("presence_penalty", 0),
-                frequency_penalty=self.model.get("frequency_penalty", 0),
+                max_tokens=PROJECT_CONFIG.openai.max_tokens,
+                temperature=PROJECT_CONFIG.openai.temperature,
             )
 
             return {
-                "model": self.model["model"],
+                "model": self.name,
                 "input": input_data,
                 "status": "processed",
                 "response": response.choices[0].message.content,
