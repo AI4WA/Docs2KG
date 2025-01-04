@@ -1,9 +1,6 @@
 from pathlib import Path
 
 from Docs2KG.utils.constants import DATA_OUTPUT_DIR
-from Docs2KG.utils.get_logger import get_logger
-
-logger = get_logger(__name__)
 
 
 class EmailParseBase:

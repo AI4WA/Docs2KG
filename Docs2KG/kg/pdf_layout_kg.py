@@ -4,14 +4,12 @@ from typing import Optional
 from uuid import uuid4
 
 import pandas as pd
+from loguru import logger
 from sentence_transformers import SentenceTransformer
 
 from Docs2KG.kg.constants import HTML_TAGS
 from Docs2KG.utils.empty_check import empty_check
-from Docs2KG.utils.get_logger import get_logger
 from Docs2KG.utils.rect import BlockFinder
-
-logger = get_logger(__name__)
 
 
 class PDFLayoutKG:

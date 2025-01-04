@@ -3,11 +3,10 @@ from pathlib import Path
 from typing import List
 
 import pandas as pd
+from loguru import logger
 
 from Docs2KG.modules.llm.openai_call import openai_call
-from Docs2KG.utils.get_logger import get_logger
 
-logger = get_logger(__name__)
 """
 Link documents within the same knowledge graph based on
 - Temporal information

@@ -6,14 +6,14 @@ from loguru import logger
 from pydantic import BaseModel, Field, SecretStr
 from yaml import safe_load
 
-from Docs2KG.utils.constants import PROJECT_DIR
+from Docs2KG.utils.constants import DATA_INPUT_DIR, DATA_OUTPUT_DIR, PROJECT_DIR
 
 CONFIG_FILE = os.getenv("CONFIG_FILE", PROJECT_DIR / "config.yml")
 
 logger.info(f"Reading configuration from: {CONFIG_FILE}")
 
 
-class OpenAIConfig(BaseModel):
+class AgentOpenAIConfig(BaseModel):
     api_key: SecretStr
     api_base: str = Field(default="https://api.openai.com/v1")
     temperature: float = Field(default=0.7)
@@ -22,7 +22,7 @@ class OpenAIConfig(BaseModel):
     max_retries: int = Field(default=2)
 
 
-class OLLAMAConfig(BaseModel):
+class AgentOLLAMAConfig(BaseModel):
     api_base: str = Field(default="http://localhost:11434")
     timeout: int = Field(default=30)
     max_retries: int = Field(default=2)
@@ -32,13 +32,13 @@ class OLLAMAConfig(BaseModel):
     stream: bool = Field(default=False)
 
 
-class HuggingFaceConfig(BaseModel):
+class AgentHuggingFaceConfig(BaseModel):
     api_token: SecretStr
     api_base: str = Field(default="https://api-inference.huggingface.co/models")
     timeout: int = Field(default=30)
 
 
-class LlamaCppConfig(BaseModel):
+class AgentLlamaCppConfig(BaseModel):
     context_length: int = Field(default=4096)
     num_threads: int = Field(default=1)
     gpu_layers: int = Field(default=0)
@@ -49,11 +49,17 @@ class LlamaCppConfig(BaseModel):
     model_path: str = Field(default="models/llama-7b.gguf")
 
 
+class DataConfig(BaseModel):
+    input_dir: Path = DATA_INPUT_DIR
+    output_dir: Path = DATA_OUTPUT_DIR
+
+
 class Config(BaseModel):
-    openai: OpenAIConfig
-    ollama: OLLAMAConfig
-    huggingface: HuggingFaceConfig
-    llamacpp: LlamaCppConfig
+    openai: AgentOpenAIConfig
+    ollama: AgentOLLAMAConfig
+    huggingface: AgentHuggingFaceConfig
+    llamacpp: AgentLlamaCppConfig
+    data: DataConfig
 
     @classmethod
     def from_yaml(cls, yaml_path: Path) -> "Config":
@@ -85,7 +91,7 @@ def get_config() -> Config:
 # Initialize configuration at startup
 PROJECT_CONFIG = get_config()
 
-logger.info(PROJECT_CONFIG)
+logger.debug(PROJECT_CONFIG)
 
 # Usage in other files:
 # from .config import config

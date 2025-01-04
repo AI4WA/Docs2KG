@@ -2,11 +2,9 @@ from pathlib import Path
 from urllib.parse import quote
 
 import requests
+from loguru import logger
 
 from Docs2KG.utils.constants import DATA_INPUT_DIR, DATA_OUTPUT_DIR
-from Docs2KG.utils.get_logger import get_logger
-
-logger = get_logger(__name__)
 
 
 class WebParserBase:

@@ -4,13 +4,11 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 import torch
+from loguru import logger
 from sklearn.metrics.pairwise import cosine_similarity
 from transformers import BertModel, BertTokenizer
 
 from Docs2KG.kg.constants import HTML_TAGS
-from Docs2KG.utils.get_logger import get_logger
-
-logger = get_logger(__name__)
 
 
 class DynamicSchema:

@@ -1,10 +1,8 @@
 import fitz
 import pandas as pd
+from loguru import logger
 
 from Docs2KG.parser.pdf.base import PDFParserBase
-from Docs2KG.utils.get_logger import get_logger
-
-logger = get_logger(__name__)
 
 
 class PDF2Tables(PDFParserBase):

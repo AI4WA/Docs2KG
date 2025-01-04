@@ -1,11 +1,10 @@
+from loguru import logger
+
 from Docs2KG.parser.pdf.pdf2blocks import PDF2Blocks
 from Docs2KG.parser.pdf.pdf2metadata import PDF_TYPE_SCANNED, get_scanned_or_exported
 from Docs2KG.parser.pdf.pdf2tables import PDF2Tables
 from Docs2KG.parser.pdf.pdf2text import PDF2Text
 from Docs2KG.utils.constants import DATA_INPUT_DIR
-from Docs2KG.utils.get_logger import get_logger
-
-logger = get_logger(__name__)
 
 if __name__ == "__main__":
     pdf_file = DATA_INPUT_DIR / "MESAJ084.pdf"

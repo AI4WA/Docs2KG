@@ -2,11 +2,9 @@ import email
 import json
 
 import pandas as pd
+from loguru import logger
 
 from Docs2KG.parser.email.base import EmailParseBase
-from Docs2KG.utils.get_logger import get_logger
-
-logger = get_logger(__name__)
 
 
 class EmailDecompose(EmailParseBase):

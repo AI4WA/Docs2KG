@@ -2,17 +2,15 @@ from pathlib import Path
 
 import fitz
 import pandas as pd
+from loguru import logger
 
 from Docs2KG.parser.pdf.constants import (
     PDF_METADATA_SCAN_INDICATOR,
     PDF_TYPE_EXPORTED,
     PDF_TYPE_SCANNED,
 )
-from Docs2KG.utils.get_logger import get_logger
 from Docs2KG.utils.llm.count_tokens import count_tokens
 from Docs2KG.utils.llm.estimate_price import estimate_price
-
-logger = get_logger(__name__)
 
 
 def get_scanned_or_exported(pdf_path: Path) -> str:

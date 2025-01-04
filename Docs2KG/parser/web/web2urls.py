@@ -2,9 +2,6 @@ import pandas as pd
 from bs4 import BeautifulSoup
 
 from Docs2KG.parser.web.base import WebParserBase
-from Docs2KG.utils.get_logger import get_logger
-
-logger = get_logger(__name__)
 
 
 class Web2URLs(WebParserBase):

@@ -6,11 +6,7 @@ from uuid import uuid4
 import pandas as pd
 import requests
 from bs4 import BeautifulSoup
-
-from Docs2KG.utils.get_logger import get_logger
-
-logger = get_logger(__name__)
-
+from loguru import logger
 
 """
 TODO:

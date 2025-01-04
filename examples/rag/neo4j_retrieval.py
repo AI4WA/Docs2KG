@@ -1,9 +1,8 @@
 import argparse
 
-from Docs2KG.rag.neo4j_rag import Neo4jRAG
-from Docs2KG.utils.get_logger import get_logger
+from loguru import logger
 
-logger = get_logger(__name__)
+from Docs2KG.rag.neo4j_rag import Neo4jRAG
 
 if __name__ == "__main__":
     args = argparse.ArgumentParser()

@@ -3,9 +3,7 @@ from copy import deepcopy
 from pathlib import Path
 from uuid import uuid4
 
-from Docs2KG.utils.get_logger import get_logger
-
-logger = get_logger(__name__)
+from loguru import logger
 
 
 class JSON2Triplets:

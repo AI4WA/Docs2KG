@@ -2,11 +2,10 @@ import json
 import shutil
 from pathlib import Path
 
+from loguru import logger
+
 from Docs2KG.parser.pdf.pdf2metadata import get_meda_for_file
 from Docs2KG.utils.constants import DATA_OUTPUT_DIR
-from Docs2KG.utils.get_logger import get_logger
-
-logger = get_logger(__name__)
 
 
 class PDFParserBase:

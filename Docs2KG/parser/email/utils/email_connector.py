@@ -1,10 +1,9 @@
 import email
 import imaplib
 
-from Docs2KG.utils.constants import DATA_INPUT_DIR
-from Docs2KG.utils.get_logger import get_logger
+from loguru import logger
 
-logger = get_logger(__name__)
+from Docs2KG.utils.constants import DATA_INPUT_DIR
 
 
 class EmailConnector:

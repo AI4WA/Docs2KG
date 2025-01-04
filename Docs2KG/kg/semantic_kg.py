@@ -3,13 +3,10 @@ import re
 from pathlib import Path
 from typing import List, Optional, Tuple
 
+from loguru import logger
 from tqdm import tqdm
 
 from Docs2KG.modules.llm.openai_call import openai_call
-from Docs2KG.utils.get_logger import get_logger
-
-logger = get_logger(__name__)
-
 
 CAPTION_KEYWORDS = [
     "fig",

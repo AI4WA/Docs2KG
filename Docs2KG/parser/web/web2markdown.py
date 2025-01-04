@@ -1,9 +1,6 @@
 from markdownify import markdownify as md
 
 from Docs2KG.parser.web.base import WebParserBase
-from Docs2KG.utils.get_logger import get_logger
-
-logger = get_logger(__name__)
 
 
 class Web2Markdown(WebParserBase):

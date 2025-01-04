@@ -1,12 +1,10 @@
 import json
 
+from loguru import logger
 from neo4j import GraphDatabase
 from tqdm import tqdm
 
 from Docs2KG.modules.llm.openai_embedding import get_openai_embedding
-from Docs2KG.utils.get_logger import get_logger
-
-logger = get_logger(__name__)
 
 
 class Neo4jVector:

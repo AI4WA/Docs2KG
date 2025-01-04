@@ -1,6 +1,8 @@
 import argparse
 from pathlib import Path
 
+from loguru import logger
+
 from Docs2KG.kg.pdf_layout_kg import PDFLayoutKG
 from Docs2KG.kg.semantic_kg import SemanticKG
 from Docs2KG.kg.utils.json2triplets import JSON2Triplets
@@ -11,9 +13,6 @@ from Docs2KG.parser.pdf.pdf2metadata import PDF_TYPE_SCANNED, get_scanned_or_exp
 from Docs2KG.parser.pdf.pdf2tables import PDF2Tables
 from Docs2KG.parser.pdf.pdf2text import PDF2Text
 from Docs2KG.utils.constants import DATA_INPUT_DIR, DATA_OUTPUT_DIR
-from Docs2KG.utils.get_logger import get_logger
-
-logger = get_logger(__name__)
 
 if __name__ == "__main__":
     """
