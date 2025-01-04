@@ -83,8 +83,6 @@ class PDFDocling(DigitizationBase):
 if __name__ == "__main__":
     # Example usage
     # pdf_path = PROJECT_CONFIG.data.input_dir / "2405.14831v1.pdf"
-    pdf_path = (
-        PROJECT_CONFIG.data.input_dir / "a89378_a089378_e09-1617_11859034_(OCR).pdf"
-    )
+    pdf_path = PROJECT_CONFIG.data.input_dir / "gsdRec_2024_08.pdf"
     processor = PDFDocling(file_path=pdf_path)
     processor.process()
