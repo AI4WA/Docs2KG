@@ -36,6 +36,11 @@ class KGConstructionBase:
         self.project_folder = PROJECT_CONFIG.data.output_dir / "projects" / project_id
         self.project_folder.mkdir(parents=True, exist_ok=True)
 
+        # create a sub folder for layout kg
+        layout_folder = self.project_folder / "layout"
+        layout_folder.mkdir(parents=True, exist_ok=True)
+        self.layout_folder = layout_folder
+
     def construct(self, docs):
         raise NotImplementedError
 

@@ -23,7 +23,8 @@ class MetadataKGConstruction(KGConstructionBase):
         self.continuous_columns = []
         self.categorical_columns = []
 
-    def _is_continuous(self, series: pd.Series, threshold: float = 0.5) -> bool:
+    @staticmethod
+    def _is_continuous(series: pd.Series, threshold: float = 0.5) -> bool:
         """
         Determine if a column should be treated as continuous based on unique value ratio
 
@@ -170,8 +171,8 @@ class MetadataKGConstruction(KGConstructionBase):
 
 # Example usage
 if __name__ == "__main__":
-    project_id = "wamex"
-    metadata_kg_construction = MetadataKGConstruction(project_id)
+    example_project_id = "wamex"
+    metadata_kg_construction = MetadataKGConstruction(example_project_id)
     metadata_kg_construction.construct(
         PROJECT_CONFIG.data.input_dir / "wamex_reports.csv",
         document_id_column="ANumber",
