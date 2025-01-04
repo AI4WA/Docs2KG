@@ -12,3 +12,4 @@ loguru==0.7.3
 llama-cpp-python==0.3.5
 docling==2.14.0
 mammoth==1.9.0
+markdownify==0.14.1
