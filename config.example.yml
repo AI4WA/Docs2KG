@@ -1,3 +1,7 @@
+data:
+  input_dir: Your input directory
+  output_dir: Your output directory
+  ontology_dir: Your ontology directory
 openai:
   api_key: "YOUR_API_KEY"
   temperature: 0.7  # optional, defaults to 0.7
@@ -26,3 +30,8 @@ llamacpp:
   top_p: 0.9          # Top-p sampling parameter
   stop_tokens: [ "\n" ]  # Tokens that will stop generation
   model_path: "YOUR_MODEL_PATH"
+semantic_kg:
+  entity_list: entity list csv path, with entity,entity_type columns
+  relation_list: relation list csv path, with relation,relation_type columns
+  ontology: ontology json path
+  domain_description: domain description text path
