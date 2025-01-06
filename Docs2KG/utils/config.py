@@ -13,7 +13,11 @@ from Docs2KG.utils.constants import (
     PROJECT_DIR,
 )
 
-CONFIG_FILE = os.getenv("CONFIG_FILE", PROJECT_DIR / "config.yml")
+CONFIG_FILE = os.getenv("CONFIG_FILE", None)
+if CONFIG_FILE is None:
+    CONFIG_FILE = PROJECT_DIR / "config.yml"
+else:
+    CONFIG_FILE = Path(CONFIG_FILE)
 
 logger.info(f"Reading configuration from: {CONFIG_FILE}")
 

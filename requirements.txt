@@ -17,3 +17,4 @@ ebooklib==0.18
 html2text==2024.2.26
 beautifulsoup4==4.12.3
 spacy==3.8.3
+markdown==3.7
