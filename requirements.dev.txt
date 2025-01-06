@@ -1,8 +1,8 @@
-black
-isort
+black==24.4.2
+isort==5.13.2
 mkdocstrings[python]
-mkdocs
-mkdocs-material
-mkdocs_gen_files
+mkdocs==1.6.1
+mkdocs-material==9.5.49
+mkdocs_gen_files==0.5.0
 black[d]
-flake8
+flake8==7.1.1
