@@ -8,7 +8,7 @@ from loguru import logger
 from spacy.matcher import Matcher
 from tqdm import tqdm
 
-from Docs2KG.agents.func.llm_judge import LLMJudge
+from Docs2KG.agents.func.ner_llm_judge import NERLLMJudge
 from Docs2KG.kg_construction.semantic_kg.base import SemanticKGConstructionBase
 from Docs2KG.utils.config import PROJECT_CONFIG
 from Docs2KG.utils.timer import timer
@@ -32,7 +32,7 @@ class NERSpacyMatcher(SemanticKGConstructionBase):
         self.matcher = Matcher(self.nlp.vocab)
         self.entity_dict = {}
         self.load_entity_list()
-        self.llm_judgement_agent = LLMJudge(agent_name, agent_type)
+        self.llm_judgement_agent = NERLLMJudge(agent_name, agent_type)
 
     def load_entity_list(self):
         try:

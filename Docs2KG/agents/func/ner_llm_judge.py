@@ -3,7 +3,7 @@ from loguru import logger
 from Docs2KG.agents.manager import AgentManager
 
 
-class LLMJudge:
+class NERLLMJudge:
     def __init__(self, agent_name="phi3.5", agent_type="ollama", **kwargs):
         self.llm = AgentManager(agent_name, agent_type, **kwargs)
 
