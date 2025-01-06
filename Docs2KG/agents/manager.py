@@ -25,6 +25,7 @@ class AgentManager:
             "ollama": OllamaAgent,
             "hf": HuggingFaceAgent,
         }
+        self.agent_type = agent_type
 
         self.agent = self._init_agent(agent_name, agent_type, **kwargs)
 
@@ -38,7 +39,9 @@ class AgentManager:
         agent_class = self.agent_types[agent_type]
         return agent_class(agent_name, **kwargs)
 
-    def process_input(self, input_data: Any) -> Any:
+    def process_input(self, input_data: Any, reset_session: bool = False) -> Any:
+        if self.agent_type == "ollama":
+            return self.agent.process(input_data, reset_session)
         return self.agent.process(input_data)
 
     def get_agent_info(self) -> Dict[str, str]:
