@@ -25,9 +25,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
         )
 
 # get the version from GITHUB_REF_NAME
-version = os.getenv("GITHUB_REF_NAME", None)
-if not version:
-    raise ValueError("Version not found in GITHUB_REF_NAME")
+version = os.getenv("GITHUB_REF_NAME", "0.0.0")
 
 setup(
     name="Docs2KG",

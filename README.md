@@ -22,6 +22,14 @@ pip install Docs2KG
 
 ![Docs2KG Design](./docs/images/Docs2KG-Design.jpg)
 
+---
+
+## Setup and Tutorial
+
+Detailed setup and tutorial can be found in the [documentation](https://docs2kg.ai4wa.com/Tutorial/1.GettingStarted/).
+
+
+
 ## Motivation
 
 To digest diverse unstructured documents into a unified knowledge graph, there are two main challenges:
@@ -61,7 +69,7 @@ Example of the interface, you only need to register, and you can access it freel
 
 ---
 
-## Setup and Development
+## Development
 
 ```bash
 python3 -m venv venv
