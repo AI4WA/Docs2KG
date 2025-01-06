@@ -6,7 +6,12 @@ from loguru import logger
 from pydantic import BaseModel, Field, SecretStr
 from yaml import safe_load
 
-from Docs2KG.utils.constants import DATA_INPUT_DIR, DATA_OUTPUT_DIR, PROJECT_DIR
+from Docs2KG.utils.constants import (
+    DATA_INPUT_DIR,
+    DATA_ONTOLOGY_DIR,
+    DATA_OUTPUT_DIR,
+    PROJECT_DIR,
+)
 
 CONFIG_FILE = os.getenv("CONFIG_FILE", PROJECT_DIR / "config.yml")
 
@@ -52,6 +57,14 @@ class AgentLlamaCppConfig(BaseModel):
 class DataConfig(BaseModel):
     input_dir: Path = DATA_INPUT_DIR
     output_dir: Path = DATA_OUTPUT_DIR
+    ontology_dir: Path = DATA_ONTOLOGY_DIR
+
+
+class SemanticKGConfig(BaseModel):
+    entity_list: str = Field(default="entity_list.csv")
+    relation_list: str = Field(default="relation_list.csv")
+    ontology: str = Field(default="ontology.json")
+    domain_description: str = Field(default="domain_description.txt")
 
 
 class Config(BaseModel):
@@ -60,6 +73,7 @@ class Config(BaseModel):
     huggingface: AgentHuggingFaceConfig
     llamacpp: AgentLlamaCppConfig
     data: DataConfig
+    semantic_kg: SemanticKGConfig
 
     @classmethod
     def from_yaml(cls, yaml_path: Path) -> "Config":

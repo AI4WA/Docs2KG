@@ -69,6 +69,8 @@ class LayoutKGConstruction(KGConstructionBase):
                     "id": element_id,
                     "text": element.get_text().strip(),
                     "label": tag_to_label[tag],
+                    "entities": [],
+                    "relations": [],
                 }
             )
 
