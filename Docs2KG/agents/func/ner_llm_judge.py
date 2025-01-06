@@ -20,11 +20,11 @@ class NERLLMJudge:
         logger.debug(f"LLM response: {response}")
 
         if "incorrect" in response["response"]:
-            logger.warning(f"LLM judgement: incorrect")
+            logger.warning("LLM judgement: incorrect")
             logger.warning(
                 f"Entity {ner}/ type {ner_type} is incorrect for text: {text}"
             )
             return False
         else:
-            logger.critical(f"LLM judgement: correct")
+            logger.critical("LLM judgement: correct")
             return True

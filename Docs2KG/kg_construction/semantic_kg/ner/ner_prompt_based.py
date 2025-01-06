@@ -83,7 +83,7 @@ class NERLLMPromptExtractor(SemanticKGConstructionBase):
                     }},
                     ...
                 ]
-            
+
             entity text is the matched text
             entity type is the label of the entity
             confidence is the confidence score of the entity, it should be within [0.0, 1.0]

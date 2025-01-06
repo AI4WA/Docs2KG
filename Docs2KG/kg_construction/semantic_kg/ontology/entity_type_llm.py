@@ -1,6 +1,6 @@
 import json
 from pathlib import Path
-from typing import Any, Optional
+from typing import Optional
 
 from loguru import logger
 
@@ -63,7 +63,7 @@ class EntityTypesLLMGenerator(SemanticKGConstructionBase):
 
                     Generated entity type should be short, concise, representative and concise.
 
-                    Return in JSON format with key entity_types, 
+                    Return in JSON format with key entity_types,
                     and value as a list of entity types which will be a string of the entity type, separated by comma.
 
                     If the current entity types already cover most of the entities, you can return an empty list.
