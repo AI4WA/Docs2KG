@@ -40,6 +40,7 @@ class KGConstructionBase:
         layout_folder = self.project_folder / "layout"
         layout_folder.mkdir(parents=True, exist_ok=True)
         self.layout_folder = layout_folder
+        self.entity_type_list = []
 
     def construct(self, docs):
         raise NotImplementedError

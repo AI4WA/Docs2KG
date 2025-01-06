@@ -205,19 +205,7 @@ class NERSpacyMatcher(SemanticKGConstructionBase):
                 # expand the item entities list with the extracted entities
                 item["entities"].extend(entities)
                 # then remove duplicated entities based on start and end positions, text and label
-                unique_entities = []
-                seen_entities = set()
-                for entity in item["entities"]:
-                    key = (
-                        entity["start"],
-                        entity["end"],
-                        entity["text"],
-                        entity["label"],
-                    )
-                    if key not in seen_entities:
-                        unique_entities.append(entity)
-                        seen_entities.add(key)
-                item["entities"] = unique_entities
+                item["entities"] = self.unique_entities(item["entities"])
 
             self.update_layout_kg(doc, layout_kg)
 

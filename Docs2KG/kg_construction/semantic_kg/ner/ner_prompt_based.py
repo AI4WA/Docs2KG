@@ -2,17 +2,14 @@ import json
 from pathlib import Path
 from typing import Any, Dict, List
 
-import pandas as pd
 from loguru import logger
 
 from Docs2KG.agents.manager import AgentManager
 from Docs2KG.kg_construction.semantic_kg.base import SemanticKGConstructionBase
 from Docs2KG.utils.config import PROJECT_CONFIG
-from Docs2KG.utils.models import Ontology
-from Docs2KG.utils.timer import timer
 
 
-class NERLLMExtractor(SemanticKGConstructionBase):
+class NERLLMPromptExtractor(SemanticKGConstructionBase):
     """
     Extract named entities using LLM and Entity Type List
     """
@@ -37,44 +34,6 @@ class NERLLMExtractor(SemanticKGConstructionBase):
         self.llm_ner_extract_agent = AgentManager(agent_name, agent_type, **kwargs)
         self.entity_type_list = []
         self.load_entity_type()
-
-    def load_entity_type(self):
-        # read from the entity list and ontology json
-        # update ontology json based on the entity list if needed
-        try:
-            entity_list_path = Path(PROJECT_CONFIG.semantic_kg.entity_list)
-            if not entity_list_path.exists():
-                raise FileNotFoundError(f"Entity list not found at {entity_list_path}")
-            with timer(logger, "Loading entity list"):
-                df = pd.read_csv(entity_list_path, sep=r",(?=[^,]*$)", engine="python")
-            # get all entity types
-            entity_type_list = df["entity_type"].unique()
-            # read from ontology json
-            ontology_json_path = Path(PROJECT_CONFIG.semantic_kg.ontology)
-            if not ontology_json_path.exists():
-                logger.warning(f"Ontology json not found at {ontology_json_path}")
-                ontology_entity_types = []
-            else:
-                with timer(logger, "Loading ontology json"):
-                    with open(ontology_json_path, "r") as f:
-                        ontology_json = json.load(f)
-                logger.info(f"Ontology json: {ontology_json}")
-                ontology = Ontology(**ontology_json)
-                # get all entity types from ontology
-                ontology_entity_types = ontology.entity_types
-
-            # combine the entity types from entity list and ontology
-            self.entity_type_list = list(
-                set(entity_type_list) | set(ontology_entity_types)
-            )
-            # update ontology json if needed
-            if len(self.entity_type_list) > len(ontology_entity_types):
-                ontology.entity_types = self.entity_type_list
-                json_str = ontology.model_dump_json()
-                with open(ontology_json_path, "w") as f:
-                    f.write(json_str)
-        except Exception as e:
-            logger.exception(e)
 
     def extract_entities(self, text: str) -> List[Dict[str, Any]]:
         """
@@ -275,7 +234,10 @@ class NERLLMExtractor(SemanticKGConstructionBase):
                     continue
                 text = item["text"]
                 entities = self.extract_entities(text)
-                item["entities"] = entities
+                # extend the extracted entities to the layout knowledge graph
+                item["entities"].extend(entities)
+                # remove duplicated entities based on start and end positions, text and label
+                item["entities"] = self.unique_entities(item["entities"])
 
             self.update_layout_kg(layout_kg_path, layout_kg)
 
@@ -295,7 +257,7 @@ if __name__ == "__main__":
     #     agent_name="gpt-4o",
     #     agent_type="cloud",
     # )
-    ner_extractor = NERLLMExtractor(
+    ner_extractor = NERLLMPromptExtractor(
         project_id=example_project_id,
         agent_name="phi3.5",
         agent_type="ollama",
