@@ -16,6 +16,8 @@ You can install it via:
 
 ```bash
 pip install Docs2KG
+
+python -m spacy download en_core_web_sm
 ```
 
 ---
