@@ -145,7 +145,6 @@ class MetadataKGConstruction(KGConstructionBase):
 
         # remove unamed columns
         df = df.loc[:, ~df.columns.str.contains("^Unnamed")]
-
         # Validate required columns
         if document_id_column not in df.columns:
             raise ValueError(f"Input data must contain '{document_id_column}' column")

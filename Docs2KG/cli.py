@@ -1,4 +1,5 @@
 import os
+import subprocess
 from pathlib import Path
 from typing import Optional, Type
 
@@ -15,6 +16,7 @@ from Docs2KG.kg_construction.semantic_kg.ner.ner_prompt_based import (
 )
 from Docs2KG.kg_construction.semantic_kg.ner.ner_spacy_match import NERSpacyMatcher
 from Docs2KG.utils.config import PROJECT_CONFIG
+from Docs2KG.utils.neo4j_loader import Neo4jTransformer
 
 
 class DocumentProcessor:
@@ -225,6 +227,192 @@ def list_formats():
     """List all supported document formats."""
     supported_formats = DocumentProcessor.get_supported_formats()
     click.echo(f"Supported document formats: {supported_formats}")
+
+
+# add command to load to neo4j, input only need to be a directory or a file
+@cli.command()
+@click.argument("project_id", type=str)
+# import or export mode
+@click.option(
+    "--mode",
+    "-m",
+    type=click.Choice(["import", "export", "load", "docker_start", "docker_stop"]),
+    default="load",
+    help="Mode of operation (import or export)",
+)
+@click.option(
+    "--neo4j-uri",
+    "-u",
+    default="bolt://localhost:7687",
+    help="URI for the Neo4j database",
+)
+@click.option(
+    "--neo4j-user",
+    "-U",
+    default="neo4j",
+    help="Username for the Neo4j database",
+)
+@click.option(
+    "--neo4j-password",
+    "-P",
+    default="testpassword",
+    help="Password for the Neo4j database",
+)
+@click.option(
+    "--reset_db",
+    "-r",
+    is_flag=True,
+    help="Reset the database before loading data",
+    default=False,
+)
+def neo4j(project_id, mode, neo4j_uri, neo4j_user, neo4j_password, reset_db):
+    """Load data to Neo4j database."""
+    input_path = PROJECT_CONFIG.data.output_dir / "projects" / project_id / "layout"
+    logger.info(f"Processing input: {input_path}")
+
+    if mode == "docker_start":
+        docker_compose = """
+services:
+  neo4j:
+    image: neo4j:latest
+    container_name: neo4j
+    environment:
+      - NEO4J_AUTH=neo4j/testpassword
+      - NEO4JLABS_PLUGINS=["apoc"]
+      - NEO4J_apoc_import_file_enabled=true
+      - NEO4J_apoc_export_file_enabled=true
+      - NEO4J_dbms_security_procedures_unrestricted=apoc.*
+    ports:
+      - 7474:7474
+      - 7687:7687
+    volumes:
+      - neo4j_data:/data
+      - neo4j_logs:/logs
+      - neo4j_import:/import
+      - neo4j_plugins:/plugins
+
+volumes:
+  neo4j_data:
+  neo4j_logs:
+  neo4j_import:
+  neo4j_plugins:
+    """
+
+        # Write docker-compose file
+        with open(PROJECT_CONFIG.data.output_dir / "docker-compose.yml", "w") as f:
+            f.write(docker_compose)
+
+        logger.info("Created docker-compose.yml file")
+
+        try:
+            # Try using docker compose first (newer syntax)
+            subprocess.run(
+                [
+                    "docker",
+                    "compose",
+                    "-f",
+                    (PROJECT_CONFIG.data.output_dir / "docker-compose.yml").as_posix(),
+                    "up",
+                    "-d",
+                ],
+                check=True,
+            )
+        except subprocess.CalledProcessError:
+            try:
+                # Fall back to docker-compose if the above fails
+                subprocess.run(
+                    [
+                        "docker-compose",
+                        "-f",
+                        (
+                            PROJECT_CONFIG.data.output_dir / "docker-compose.yml"
+                        ).as_posix(),
+                        "up",
+                        "-d",
+                    ],
+                    check=True,
+                )
+            except subprocess.CalledProcessError as e:
+                logger.error("Failed to start Docker container: %s", e)
+                raise
+
+        logger.info("Neo4j container is starting up")
+        logger.info("Access Neo4j Browser at http://localhost:7474")
+        return
+
+    if mode == "docker_stop":
+        try:
+            # Try using docker compose first (newer syntax)
+            subprocess.run(
+                [
+                    "docker",
+                    "compose",
+                    "-f",
+                    (PROJECT_CONFIG.data.output_dir / "docker-compose.yml").as_posix(),
+                    "down",
+                ],
+                check=True,
+            )
+        except subprocess.CalledProcessError:
+            try:
+                # Fall back to docker-compose if the above fails
+                subprocess.run(
+                    [
+                        "docker-compose",
+                        "-f",
+                        (
+                            PROJECT_CONFIG.data.output_dir / "docker-compose.yml"
+                        ).as_posix(),
+                        "down",
+                    ],
+                    check=True,
+                )
+            except subprocess.CalledProcessError as e:
+                logger.error("Failed to stop Docker container: %s", e)
+                raise
+
+        logger.info("Neo4j container is stopping")
+        return
+
+    # Initialize Neo4j transformer
+    transformer = Neo4jTransformer(
+        project_id=project_id,
+        uri=neo4j_uri,
+        username=neo4j_user,
+        password=neo4j_password,
+        reset_database=reset_db,
+    )
+
+    if mode == "load":
+        if input_path.is_dir():
+            for file_path in input_path.glob("*.json"):
+                # if it is schema.json, skip
+                if file_path.name == "schema.json":
+                    continue
+                try:
+                    transformer.transform_and_load(file_path)
+                except Exception as e:
+                    logger.error(f"Error loading {file_path.name}: {str(e)}")
+                    logger.exception(e)
+                    continue
+        else:
+            try:
+                transformer.transform_and_load(input_path)
+            except Exception as e:
+                logger.error(f"Error loading {input_path.name}: {str(e)}")
+
+    elif mode == "export":
+        transformer.export()
+    elif mode == "import":
+        project_json_path = (
+            PROJECT_CONFIG.data.output_dir
+            / "projects"
+            / project_id
+            / "neo4j_export.json"
+        )
+        transformer.import_from_json(project_json_path)
+    else:
+        raise click.ClickException("Invalid mode of operation")
 
 
 if __name__ == "__main__":
