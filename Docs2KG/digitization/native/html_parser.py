@@ -17,16 +17,16 @@ class HTMLDocling(DigitizationBase):
     HTMLDocling class for processing HTML content from files or URLs to markdown.
     """
 
-    def __init__(self, source: Union[str, Path]):
-        self.is_url = isinstance(source, str) and self._is_valid_url(source)
+    def __init__(self, file_path: Union[str, Path]):
+        self.is_url = isinstance(file_path, str) and self._is_valid_url(file_path)
 
         if self.is_url:
             # Create a filename from the URL
-            url_path = urlparse(source).path
+            url_path = urlparse(file_path).path
             url_filename = (
                 unquote(Path(url_path).name)
                 if url_path and Path(url_path).name
-                else urlparse(source).netloc
+                else urlparse(file_path).netloc
             )
             self.html_filename = (
                 f"{url_filename}.html"
@@ -36,16 +36,16 @@ class HTMLDocling(DigitizationBase):
 
             # Download and save the HTML content
             self.html_path = PROJECT_CONFIG.data.input_dir / self.html_filename
-            self._download_and_save_html(source)
+            self._download_and_save_html(file_path)
 
             # Use the saved file path as the source
-            source = self.html_path
+            file_path = self.html_path
 
         super().__init__(
-            file_path=source,
+            file_path=file_path,
             supported_formats=["html", "htm"],
         )
-        self.source = source
+        self.source = file_path
 
     def _download_and_save_html(self, url: str) -> None:
         """

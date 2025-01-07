@@ -38,6 +38,8 @@ You have two ways to run the package:
 ### Command Line
 
 ```bash
+# first setup the CONFIG_FILE environment variable to local one
+export CONFIG_FILE=config.yml # or any other path for the configuration file
 docs2kg # this command will tell you how to use the package
 
 # we currently support the following commands
