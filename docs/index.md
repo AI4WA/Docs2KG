@@ -20,6 +20,41 @@ pip install Docs2KG
 python -m spacy download en_core_web_sm
 ```
 
+Detailed setup and tutorial can be found in the [documentation](https://docs2kg.ai4wa.com/Tutorial/1.GettingStarted/).
+
+You have two ways to run the package:
+
+- import the package in the code, and hook it with your own code
+- run the package in the command line
+
+### Command Line
+
+```bash
+docs2kg # this command will tell you how to use the package
+
+# we currently support the following commands
+docs2kg process-document your_input_file --agent-name phi3.5 --agent-type ollama --project-id your_project_id
+docs2kg batch-process your_input_dir --agent-name phi3.5 --agent-type ollama --project-id your_project_id
+docs2kg list-formats # list all the supported formats
+```
+
+```text
+Usage: docs2kg [OPTIONS] COMMAND [ARGS]...
+
+  Docs2KG - Document to Knowledge Graph conversion tool.
+
+  Supports multiple document formats: PDF, DOCX, HTML, and EPUB.
+
+Options:
+  -c, --config PATH  Path to the configuration file (default: ./config.yml)
+  --help             Show this message and exit.
+
+Commands:
+  batch-process     Process all supported documents in a directory.
+  list-formats      List all supported document formats.
+  process-document  Process a single document file.
+```
+
 ---
 
 ![Docs2KG Design](./images/Docs2KG-Design.jpg)
