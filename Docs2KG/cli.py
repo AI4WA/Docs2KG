@@ -38,29 +38,18 @@ class DocumentProcessor:
         return ", ".join(cls.PROCESSORS.keys())
 
 
-def setup_environment(config_path: str = None):
-    """Setup the environment with the config file."""
-    if config_path:
-        os.environ["CONFIG_FILE"] = str(Path(config_path).resolve())
-    else:
-        os.environ["CONFIG_FILE"] = str(Path.cwd() / "config.yml")
-
-
 @click.group()
-@click.option(
-    "--config",
-    "-c",
-    type=click.Path(exists=True),
-    help="Path to the configuration file (default: ./config.yml)",
-)
-def cli(config):
+def cli():
     """Docs2KG - Document to Knowledge Graph conversion tool.
 
     Supports multiple document formats: PDF, DOCX, HTML, and EPUB.
     """
-    setup_environment(config)
-    logger.info(f"Using configuration: {os.environ.get('CONFIG_FILE')}")
-    logger.info(PROJECT_CONFIG.data)
+    logger.info("Welcome to Docs2KG!")
+    logger.info(f"Configuration loaded from: {os.environ.get('CONFIG_FILE')}")
+    logger.info(f"Input directory: {PROJECT_CONFIG.data.input_dir}")
+    logger.info(f"Output directory: {PROJECT_CONFIG.data.output_dir}")
+    logger.info(f"Ontology directory: {PROJECT_CONFIG.data.ontology_dir}")
+    logger.info("---")
 
 
 def process_single_file(
@@ -154,7 +143,11 @@ def process_document(file_path, project_id, agent_name, agent_type):
 
 
 @cli.command()
-@click.argument("input_dir", type=click.Path(exists=True))
+@click.argument(
+    "input_dir",
+    type=click.Path(exists=True),
+    default=PROJECT_CONFIG.data.input_dir.as_posix(),
+)
 @click.option(
     "--project-id",
     "-p",
