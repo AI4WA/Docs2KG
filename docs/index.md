@@ -20,6 +20,71 @@ pip install Docs2KG
 python -m spacy download en_core_web_sm
 ```
 
+Detailed setup and tutorial can be found in the [documentation](https://docs2kg.ai4wa.com/Tutorial/1.GettingStarted/).
+
+You have two ways to run the package:
+
+- import the package in the code, and hook it with your own code
+- run the package in the command line
+
+### Command Line
+
+```bash
+docs2kg # this command will tell you how to use the package
+
+# we currently support the following commands
+docs2kg process-document your_input_file --agent-name phi3.5 --agent-type ollama --project-id your_project_id
+docs2kg batch-process your_input_dir --agent-name phi3.5 --agent-type ollama --project-id your_project_id
+docs2kg list-formats # list all the supported formats
+```
+
+```text
+Usage: docs2kg [OPTIONS] COMMAND [ARGS]...
+
+  Docs2KG - Document to Knowledge Graph conversion tool.
+
+  Supports multiple document formats: PDF, DOCX, HTML, and EPUB.
+
+Options:
+  -c, --config PATH  Path to the configuration file (default: ./config.yml)
+  --help             Show this message and exit.
+
+Commands:
+  batch-process     Process all supported documents in a directory.
+  list-formats      List all supported document formats.
+  neo4j             Load data to Neo4j database.
+  process-document  Process a single document file.
+```
+
+```text
+Usage: docs2kg process-document [OPTIONS] FILE_PATH
+
+  Process a single document file.
+
+  FILE_PATH: Path to the document file (PDF, DOCX, HTML, or EPUB)
+
+Options:
+  -p, --project-id TEXT  Project ID for the knowledge graph construction
+  -n, --agent-name TEXT  Name of the agent to use for NER extraction
+  -t, --agent-type TEXT  Type of the agent to use for NER extraction
+  --help                 Show this message and exit.
+```
+
+```text
+Usage: docs2kg neo4j [OPTIONS] PROJECT_ID
+
+  Load data to Neo4j database.
+
+Options:
+  -m, --mode [import|export|load|docker_start|docker_stop]
+                                  Mode of operation (import or export)
+  -u, --neo4j-uri TEXT            URI for the Neo4j database
+  -U, --neo4j-user TEXT           Username for the Neo4j database
+  -P, --neo4j-password TEXT       Password for the Neo4j database
+  -r, --reset_db                  Reset the database before loading data
+  --help      
+```
+
 ---
 
 ![Docs2KG Design](./images/Docs2KG-Design.jpg)
