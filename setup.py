@@ -56,4 +56,9 @@ setup(
     project_urls={
         "Source": "https://github.com/AI4WA/Docs2KG",
     },
+    entry_points={
+        "console_scripts": [
+            "docs2kg=Docs2KG.cli:cli",
+        ],
+    },
 )
