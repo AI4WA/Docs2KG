@@ -7,6 +7,7 @@
 [![Demo](https://img.shields.io/badge/Demo-Available-blue)](https://docs2kg.ai4wa.com/Video/)
 ![Lint](https://github.com/AI4WA/Docs2KG/actions/workflows/lint.yml/badge.svg)
 ![Documentation](https://github.com/AI4WA/Docs2KG/actions/workflows/docs.yml/badge.svg)
+[![DOI](https://zenodo.org/badge/797819169.svg)](https://doi.org/10.5281/zenodo.14788362)
 
 ## Installation
 
