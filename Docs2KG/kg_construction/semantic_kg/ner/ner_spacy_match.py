@@ -218,7 +218,7 @@ if __name__ == "__main__":
         / "projects"
         / example_project_id
         / "layout"
-        / "gsdRec_2024_08.json"
+        / "a106249_e38_2909_final_surrender_report__OCR__docs2kg_2025-04-01T15-13-53-392Z.json"
     )
     entity_extractor = NERSpacyMatcher(example_project_id)
     entity_extractor.construct_kg([example_json])

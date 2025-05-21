@@ -250,7 +250,7 @@ if __name__ == "__main__":
         / "projects"
         / example_project_id
         / "layout"
-        / "gsdRec_2024_08.json"
+        / "a65054_a065054_c321_1993_fwp_annual_report_2001_2002_14067246__OCR__docs2kg_2025-05-21T01-42-10-538Z.json"
     )
     # ner_extractor = NERLLMExtractor(
     #     project_id=example_project_id,
